@@ -1,0 +1,41 @@
+{
+  "name": "daystream",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "client:install": "cd client && yarn install",
+    "client:dev": "cd client && yarn dev",
+    "client:build": "cd client && yarn build",
+    "client:start": "cd client && yarn start",
+    "server:install": "cd server && yarn install",
+    "server:dev": "cd server && yarn dev",
+    "server:build": "cd server && yarn build",
+    "server:start": "cd server && yarn start",
+    "install": "yarn server:install && yarn client:install",
+    "dev": "concurrently --names \"server,client\" --prefix-colors \"blue,green\" \"yarn server:dev\" \"yarn client:dev\"",
+    "build": "yarn server:build && yarn client:build",
+    "start": "--names \"server,client\" --prefix-colors \"blue,green\" \"yarn server:start\" \"yarn client:start\"",
+    "format": "biome format . --write",
+    "lint": "biome check .",
+    "lint:fix": "yarn lint --apply"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/adityanithariya/Daystream.git"
+  },
+  "author": "adityanithariya",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/adityanithariya/Daystream/issues"
+  },
+  "homepage": "https://github.com/adityanithariya/Daystream#readme",
+  "devDependencies": {
+    "@biomejs/biome": "^1.6.4",
+    "concurrently": "^8.2.2",
+    "simple-git-hooks": "^2.11.1"
+  },
+  "simple-git-hooks": {
+    "pre-commit": "yarn format && yarn lint:fix"
+  }
+}
