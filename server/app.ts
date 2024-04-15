@@ -1,9 +1,12 @@
+import 'module-alias/register'
+
+import { checkAuth } from '@controller/auth.controller'
+import verifyJWT from '@middleware/verifyJWT'
 import authRouter from '@routes/auth.routes'
 import cookieParser from 'cookie-parser'
 import { config } from 'dotenv'
-import express from 'express'
 import type { Request, Response } from 'express'
-import 'module-alias/register'
+import express from 'express'
 import { connect, connection } from 'mongoose'
 
 config()
@@ -20,6 +23,9 @@ app.use('/auth', authRouter)
 app.get('/health', (_req: Request, res: Response) => {
   res.send('OK').status(200)
 })
+
+app.use(verifyJWT)
+app.get('/auth/protect', checkAuth)
 
 connection.on('connected', () => {
   console.log('Connected to MongoDB')
