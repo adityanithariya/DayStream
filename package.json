@@ -36,6 +36,6 @@
     "simple-git-hooks": "^2.11.1"
   },
   "simple-git-hooks": {
-    "pre-commit": "yarn format && yarn lint:fix"
+    "pre-commit": "yarn lint && yarn format"
   }
 }

@@ -1,4 +1,4 @@
-import { Schema, SchemaType, model } from 'mongoose'
+import { Schema, model } from 'mongoose'
 
 interface UserType {
   username: string

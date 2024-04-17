@@ -1,15 +1,15 @@
+import { config } from 'dotenv'
 import 'module-alias/register'
+config()
 
 import { checkAuth } from '@controller/auth.controller'
+import '@middleware/config'
 import verifyJWT from '@middleware/verifyJWT'
 import authRouter from '@routes/auth.routes'
 import cookieParser from 'cookie-parser'
-import { config } from 'dotenv'
 import type { Request, Response } from 'express'
 import express from 'express'
-import { connect, connection } from 'mongoose'
-
-config()
+import { connect } from 'mongoose'
 
 const app = express()
 const port = process.env.PORT || 5000
@@ -27,22 +27,8 @@ app.get('/health', (_req: Request, res: Response) => {
 app.use(verifyJWT)
 app.get('/auth/protect', checkAuth)
 
-connection.on('connected', () => {
-  console.log('Connected to MongoDB')
-})
-
-connection.on('disconnected', () => {
-  console.log('Disconnected from MongoDB')
-})
-
-process.on('SIGINT' || 'SIGTERM', async () => {
-  console.log('Disconnecting from MongoDB...')
-  await connection.close()
-  process.exit(0)
-})
-
 console.log('Connecting to MongoDB...')
 app.listen(port, async () => {
-  await connect(process.env.MONGODB_URI as string)
+  await connect(process.env.MONGO_URI as string)
   console.log(`Server listening on http://localhost:${port}`)
 })
