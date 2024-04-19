@@ -1,3 +1,4 @@
+import { cn } from '@utils/utils'
 import type { Metadata } from 'next'
 import { Poppins } from 'next/font/google'
 import './globals.css'
@@ -16,7 +17,14 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={inter.className}>{children}</body>
+      <body
+        className={cn(
+          inter.className,
+          'min-h-screen bg-background antialiased',
+        )}
+      >
+        {children}
+      </body>
     </html>
   )
 }
