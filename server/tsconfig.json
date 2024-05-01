@@ -77,7 +77,8 @@
       "@controller/*": ["./controller/*"],
       "@model/*": ["./model/*"],
       "@routes/*": ["./routes/*"],
-      "@middleware/*": ["./middleware/*"]
+      "@middleware/*": ["./middleware/*"],
+      "@utils/*": ["./utils/*"]
     },
     "baseUrl": "./"
   },
