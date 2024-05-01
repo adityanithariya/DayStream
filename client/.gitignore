@@ -34,3 +34,13 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# next-pwa
+**/public/sw.js
+**/public/sw.js.map
+**/public/workbox-*.js
+**/public/worker-*.js
+**/public/workbox-*.js.map
+**/public/worker-*.js.map
+
+certificates

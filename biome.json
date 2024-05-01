@@ -3,14 +3,14 @@
     "ignore": ["CHANGELOG.md", "yarn.lock"]
   },
   "formatter": {
-    "ignore": ["**/.next/**", "**/dist/**"],
+    "ignore": ["**/.next/**", "**/dist/**", "**/public/**"],
     "enabled": true,
     "formatWithErrors": false,
     "indentStyle": "space",
     "lineWidth": 80
   },
   "linter": {
-    "ignore": ["**/.next/**", "**/dist/**"],
+    "ignore": ["**/.next/**", "**/dist/**", "**/public/**"],
     "enabled": true,
     "rules": {
       "recommended": true,
