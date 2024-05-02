@@ -20,11 +20,13 @@ authRouter.get(
 authRouter.get(
   '/google/callback',
   passport.authenticate('google', {
-    failureRedirect: 'http://localhost:3000/login?error=google-auth-failed',
+    failureRedirect: `${process.env.CLIENT_BASE_URL}/login?error=google-auth-failed`,
     session: false,
   }),
   (req: Request, res: Response) => {
-    res.redirect(`http://localhost:3000/login/${signJWT(req.user as IUser)}`)
+    res.redirect(
+      `${process.env.CLIENT_BASE_URL}/login/${signJWT(req.user as IUser)}`,
+    )
   },
 )
 
