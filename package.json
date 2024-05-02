@@ -18,7 +18,8 @@
     "start": "--names \"server,client\" --prefix-colors \"blue,green\" \"yarn server:start\" \"yarn client:start\"",
     "format": "biome format . --write",
     "lint": "biome check .",
-    "lint:fix": "yarn lint --apply"
+    "lint:fix": "yarn lint --apply",
+    "pre-add": "yarn lint:fix && yarn format"
   },
   "repository": {
     "type": "git",

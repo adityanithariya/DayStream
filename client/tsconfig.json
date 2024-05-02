@@ -18,7 +18,11 @@
       }
     ],
     "paths": {
-      "@/*": ["./*"]
+      "@assets/*": ["./assets/*"],
+      "@components/*": ["./components/*"],
+      "@lib/*": ["./lib/*"],
+      "@public/*": ["./public/*"],
+      "@store/*": ["./store/*"]
     },
     "types": ["@serwist/next/typings"]
   },
