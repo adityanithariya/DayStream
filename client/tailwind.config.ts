@@ -42,12 +42,21 @@ const config = {
             backgroundColor: '#fff',
           },
         },
+        verified: {
+          '0%': {
+            boxShadow: '0 0 7px 0 #03b5fb01',
+          },
+          '100%': {
+            boxShadow: '0 0 7px 0 #03b5fb7a',
+          },
+        },
       },
       animation: {
         'accordion-down': 'accordion-down 0.2s ease-out',
         'accordion-up': 'accordion-up 0.2s ease-out',
         'caret-blink': 'caret-blink 1.25s ease-out infinite',
         'button-tap': 'button-tap .1s ease-out',
+        verified: 'verified .75s ease-out',
       },
     },
   },

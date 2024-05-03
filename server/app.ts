@@ -3,9 +3,10 @@ import 'module-alias/register'
 config()
 
 import { checkAuth } from '@controller/auth.controller'
-import initPassport from '@middleware/auth'
+import initPassport, { pinAuth } from '@middleware/auth'
 import '@middleware/config'
 import authRouter from '@routes/auth.routes'
+import userRouter from '@routes/user.routes'
 import cookieParser from 'cookie-parser'
 import cors from 'cors'
 import express from 'express'
@@ -32,6 +33,8 @@ app.get('/health', (_req: Request, res: Response) => {
 })
 
 app.use(passport.authenticate('jwt', { session: false }))
+app.use('/u', userRouter)
+app.use(pinAuth)
 app.get('/auth/protect', checkAuth)
 
 console.log('Connecting to MongoDB...')

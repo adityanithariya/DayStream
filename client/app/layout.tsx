@@ -55,7 +55,9 @@ export default function RootLayout({
   return (
     <html lang="en" dir="ltr">
       <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon" />
-      <body className={inter.className}>{children}</body>
+      <body className={inter.className} suppressHydrationWarning>
+        {children}
+      </body>
     </html>
   )
 }

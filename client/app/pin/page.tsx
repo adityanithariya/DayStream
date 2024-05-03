@@ -6,9 +6,12 @@ import {
   InputOTPSeparator,
   InputOTPSlot,
 } from '@components/ui/input-otp'
+import useAPI from '@hooks/useAPI'
 import clsx from 'clsx'
+import { AES } from 'crypto-js'
 import { REGEXP_ONLY_DIGITS } from 'input-otp'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import React, { type ReactElement, useState, useRef, useEffect } from 'react'
 import { FaShield } from 'react-icons/fa6'
 import { IoIosArrowRoundBack } from 'react-icons/io'
@@ -48,9 +51,15 @@ const PINButton = ({
   )
 }
 
+type VerifyPINType = {
+  valid: boolean
+  sessionId: string
+}
+
 const PINLogin = () => {
   const [pin, setPin] = useState<string>('')
-  const showInValid = pin.length === 6 && pin !== '123456'
+  const [isValid, setIsValid] = useState(false)
+  const [loading, setLoading] = useState(false)
   const keypad = [
     { id: 1, value: 1 },
     { id: 2, value: 2 },
@@ -65,8 +74,43 @@ const PINLogin = () => {
     { id: 11, value: 0 },
     { id: 12, value: <IoIosArrowRoundBack /> },
   ]
+
+  const box = useRef<HTMLElement>(null)
+  const navigate = useRouter()
+  const api = useAPI()
+  const verifyPin = async () => {
+    setLoading(true)
+
+    try {
+      const {
+        data: { valid, sessionId },
+      } = await api.post<VerifyPINType>('/u/pin/verify', { pin })
+
+      if (valid) {
+        setIsValid(valid)
+
+        console.log('Encrypting: ', pin, sessionId)
+        sessionStorage.setItem(
+          'pin-auth',
+          AES.encrypt(pin, sessionId).toString(),
+        )
+        setTimeout(() => {
+          navigate.replace('/')
+        }, 500)
+        box.current?.classList.add('animate-verified')
+      }
+    } catch (err: any) {
+      console.log(err)
+      if (err?.response?.status === 401) navigate.replace('/login')
+    }
+
+    setLoading(false)
+  }
   return (
-    <main className="h-screen flex flex-col items-center sm:h-[50vh] sm:w-[50vw] lg:w-[35vw] sm:justify-center sm:mt-[20vh] sm:mx-auto sm:border sm:rounded-2xl">
+    <main
+      ref={box}
+      className="h-screen flex flex-col items-center sm:h-[50vh] sm:w-[50vw] lg:w-[35vw] sm:justify-center sm:mt-[20vh] sm:mx-auto sm:border sm:rounded-2xl"
+    >
       <div className="relative w-[100vw] py-10 flex justify-center">
         <FaShield className="size-7 text-primary" />
         <Link
@@ -83,6 +127,7 @@ const PINLogin = () => {
         pattern={REGEXP_ONLY_DIGITS}
         value={pin}
         onChange={setPin}
+        onComplete={verifyPin}
       >
         <InputOTPGroup>
           <InputOTPSlot index={0} />
@@ -99,7 +144,7 @@ const PINLogin = () => {
       <div
         className={clsx(
           'text-xs font-semibold text-red-500 mt-3',
-          !showInValid && 'opacity-0',
+          (pin.length < 6 || loading || isValid) && 'opacity-0',
         )}
       >
         Invalid PIN

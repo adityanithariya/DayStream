@@ -1,11 +1,17 @@
 import User, { type IUser } from '@model/User.model'
-import type { Express } from 'express'
+import CryptoJS from 'crypto-js'
+import type {
+  Express as ExpressApp,
+  NextFunction,
+  Request,
+  Response,
+} from 'express'
 import passport from 'passport'
 import { Strategy as GoogleStrategy } from 'passport-google-oauth20'
 import { Strategy as JwtStrategy } from 'passport-jwt'
 import { Strategy as LocalStrategy } from 'passport-local'
 
-const initPassport = (app: Express) => {
+const initPassport = (app: ExpressApp) => {
   app.use(passport.initialize())
   passport.use(
     'signup',
@@ -93,6 +99,37 @@ const initPassport = (app: Express) => {
       },
     ),
   )
+}
+
+declare global {
+  namespace Express {
+    interface User extends IUser {}
+  }
+}
+
+export const pinAuth = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  if (!req?.headers?.pinAuth)
+    return res
+      .status(401)
+      .json({ error: 'PIN Unauthenticated', code: 'pin-auth-failed' })
+  const user = await User.findById(req?.user?.id).select('+sessionId')
+  console.log('Decrypting: ', req?.headers?.pinAuth, user?.sessionId)
+  const pin = CryptoJS.AES.decrypt(
+    req?.headers?.pinAuth as string,
+    user?.sessionId as string,
+  ).toString(CryptoJS.enc.Utf8)
+
+  if (user?.isValidPin(pin)) next()
+  else {
+    res.statusMessage = 'pin-auth-failed'
+    return res
+      .status(401)
+      .json({ error: 'PIN Unauthenticated', code: 'pin-auth-failed' })
+  }
 }
 
 export default initPassport
