@@ -9,14 +9,17 @@ const GoogleAuth = async ({
   const navigate = useRouter()
   useEffect(() => {
     ;(async () => {
-      const res = await fetch('http://localhost:5000/auth/google/success', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
+      const res = await fetch(
+        `${process.env.SERVER_BASE_URL}/auth/google/success`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          credentials: 'include',
+          body: JSON.stringify({ token }),
         },
-        credentials: 'include',
-        body: JSON.stringify({ token }),
-      })
+      )
       const data = await res.json()
       if (data.success) navigate.replace('/')
     })()

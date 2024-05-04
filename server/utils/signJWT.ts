@@ -11,7 +11,7 @@ const signJWT = (userId: ObjectId | IUser): string =>
 export const tokenConfig: CookieOptions = {
   maxAge: 15 * 24 * 60 * 60 * 1000,
   httpOnly: false,
-  sameSite: 'lax',
+  sameSite: 'strict',
   secure: process.env.Node_ENV === 'production',
 }
 

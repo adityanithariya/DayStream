@@ -6,6 +6,10 @@ const withSerwist = withSerwistInit({
   swDest: 'public/sw.js',
 })
 
-const nextConfig = {}
+const nextConfig = {
+  env: {
+    SERVER_BASE_URL: process.env.SERVER_BASE_URL,
+  },
+}
 
 export default withSerwist(nextConfig)

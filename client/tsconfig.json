@@ -22,7 +22,8 @@
       "@components/*": ["./components/*"],
       "@lib/*": ["./lib/*"],
       "@public/*": ["./public/*"],
-      "@store/*": ["./store/*"]
+      "@store/*": ["./store/*"],
+      "@hooks/*": ["./hooks/*"]
     },
     "types": ["@serwist/next/typings"]
   },
