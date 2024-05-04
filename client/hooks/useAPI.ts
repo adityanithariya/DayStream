@@ -33,8 +33,8 @@ const useAPI = () => {
         if (data?.code === 'pin-auth-failed')
           navigate.replace(`/pin?next=${pathname}`)
         else navigate.replace(`/login?next=${pathname}`)
-      }
-      return Promise.resolve()
+      } else return Promise.reject(error)
+      return Promise.resolve(error)
     },
   )
   return API
