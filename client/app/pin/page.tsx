@@ -89,7 +89,6 @@ const PINLogin = () => {
       if (valid) {
         setIsValid(valid)
 
-        console.log('Encrypting: ', pin, sessionId)
         sessionStorage.setItem(
           'pin-auth',
           AES.encrypt(pin, sessionId).toString(),

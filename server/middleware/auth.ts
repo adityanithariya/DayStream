@@ -76,8 +76,7 @@ const initPassport = (app: ExpressApp) => {
         clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
         callbackURL: process.env.GOOGLE_CALLBACK_URL as string,
       },
-      async (accessToken, refreshToken, profile, cb) => {
-        console.log(accessToken, refreshToken, profile)
+      async (_accessToken, _refreshToken, profile, cb) => {
         if (!profile.id) return cb(new Error('Google Sign-In Failed'))
         const user = await User.findOne({ googleId: profile.id })
         if (!user && profile.emails && profile.emails[0].value) {
@@ -91,7 +90,6 @@ const initPassport = (app: ExpressApp) => {
             locale,
           })
           await newUser.save()
-          console.log(newUser)
 
           return cb(null, newUser)
         }
@@ -117,7 +115,6 @@ export const pinAuth = async (
       .status(401)
       .json({ error: 'PIN Unauthenticated', code: 'pin-auth-failed' })
   const user = await User.findById(req?.user?.id).select('+sessionId')
-  console.log('Decrypting: ', req?.headers?.pinAuth, user?.sessionId)
   const pin = CryptoJS.AES.decrypt(
     req?.headers?.pinAuth as string,
     user?.sessionId as string,
