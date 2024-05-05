@@ -1,7 +1,7 @@
 'use client'
 
 import type { NextPage } from 'next'
-import React, { useEffect } from 'react'
+import React, { Component, useEffect } from 'react'
 
 const Home: NextPage = () => {
   useEffect(() => {
@@ -13,7 +13,7 @@ const Home: NextPage = () => {
       console.log(data)
     })()
   })
-  return <div>Hello World!</div>
+  return <div></div>
 }
 
 export default Home

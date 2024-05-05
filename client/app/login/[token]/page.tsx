@@ -3,9 +3,7 @@
 import { useRouter } from 'next/navigation'
 import React, { useEffect } from 'react'
 
-const GoogleAuth = async ({
-  params: { token },
-}: { params: { token: string } }) => {
+const GoogleAuth = ({ params: { token } }: { params: { token: string } }) => {
   const navigate = useRouter()
   useEffect(() => {
     ;(async () => {
