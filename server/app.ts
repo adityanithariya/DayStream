@@ -31,7 +31,7 @@ app.use(express.json())
 app.use(express.urlencoded({ extended: false }))
 
 app.use('/auth', authRouter)
-app.get('/health', (_req: Request, res: Response) => {
+app.get('/', (_req: Request, res: Response) => {
   res.send('OK').status(200)
 })
 
@@ -45,3 +45,5 @@ app.listen(port, async () => {
   await connect(process.env.MONGO_URI as string)
   console.log(`Server listening on http://localhost:${port}`)
 })
+
+export default app
