@@ -2,7 +2,7 @@
   "name": "server",
   "version": "1.0.0",
   "description": "",
-  "main": "./dist/app.ts",
+  "main": "./app.ts",
   "dependencies": {
     "bcrypt": "^5.1.1",
     "cookie-parser": "^1.4.6",
@@ -40,7 +40,7 @@
   "scripts": {
     "dev": "nodemon",
     "build": "rimraf dist && tsc -p tsconfig.json",
-    "start": "node ./dist/app.js"
+    "start": "node ./app.js"
   },
   "repository": {
     "type": "git",
@@ -53,10 +53,10 @@
   },
   "homepage": "https://github.com/adityanithariya/Daystream#readme",
   "_moduleAliases": {
-    "@controller": "dist/controller",
-    "@model": "dist/model",
-    "@routes": "dist/routes",
-    "@middleware": "dist/middleware",
-    "@utils": "dist/utils"
+    "@controller": "controller",
+    "@model": "model",
+    "@routes": "routes",
+    "@middleware": "middleware",
+    "@utils": "utils"
   }
 }
