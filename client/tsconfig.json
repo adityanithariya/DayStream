@@ -23,7 +23,8 @@
       "@lib/*": ["./lib/*"],
       "@public/*": ["./public/*"],
       "@store/*": ["./store/*"],
-      "@hooks/*": ["./hooks/*"]
+      "@hooks/*": ["./hooks/*"],
+      "@type/*": ["./types/*"]
     },
     "types": ["@serwist/next/typings"]
   },
