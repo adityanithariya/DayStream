@@ -13,7 +13,7 @@ const Home: NextPage = () => {
       console.log(data)
     })()
   })
-  return <div></div>
+  return <div />
 }
 
 export default Home

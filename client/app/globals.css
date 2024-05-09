@@ -1,3 +1,11 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+
+
+/* In your CSS file or within a style block in JSX */
+.custom-input {
+    @apply w-full p-3 rounded-3xl bg-custom-blue border border-white placeholder-white focus:border-white focus:outline-none;
+  }
+  
