@@ -51,25 +51,28 @@ const Signup: NextPage = () => {
 
   return isLoginActive ? (
     // Login
-    <div className="flex justify-center items-center h-screen">
-      <div className="bg-gradient-to-b from-teal-200 to-blue-500 w-400  flex flex-col items-center justify-center">
-        <div className="max-w-md  bg-light-blue rounded-md ">
+    <div className="flex justify-center items-center h-screen sm:w-300">
+      {' '}
+      <div className="bg-gradient-to-b from-light-blue to-blue-500 w-auto flex flex-col items-center justify-center sm:h-auto py-10">
+        <div className="max-w-md h-20 w-20 bg-light-blue rounded-md mb-8 flex items-center justify-center">
+          {' '}
           <Image
-            className="p-5"
+            className="p-3 text-xl"
             src="/icon-72x72.png"
             alt="logo"
-            height={72}
-            width={72}
+            height={96}
+            width={96}
           />
         </div>
-        DayStream
+        <span className="text-white mb-8 text-2xl">DayStream</span>
         <form
-          className="flex flex-col space-y-4 px-7"
+          className="flex flex-col px-5 sm:h-auto"
           onSubmit={(e) => {
             e.preventDefault()
           }}
         >
-          <div className="flex flex-col space-y-4 ">
+          <div className="flex flex-col space-y-6">
+            {' '}
             <input
               className="custom-input"
               type="text"
@@ -86,14 +89,20 @@ const Signup: NextPage = () => {
             />
           </div>
           <button
-            className="p-2 bg-white rounded-3xl text-dark-blue"
+            className="p-2 bg-white rounded-3xl text-dark-blue mt-8"
             type="submit"
           >
             LOGIN
           </button>
-          <p>
-            Dont have an account?{' '}
-            <button type="submit" onClick={toggleForms}>
+          <span className="text-white m-auto text-sm mb-8">
+            Forgot password?
+          </span>
+          <span className="text-white m-auto text-sm mb-8">
+            or continue with
+          </span>
+          <p className="text-white mb-0 text-sm">
+            Dont have an account?
+            <button className="text-sm" type="submit" onClick={toggleForms}>
               Sign Up now!
             </button>
           </p>
@@ -128,8 +137,8 @@ const Signup: NextPage = () => {
           onChange={handlePasswordChange}
         />
         <Button type="submit">Signup</Button>
-        <p>
-          Already have an account?{' '}
+        <p className="text-sm">
+          Already have an account?
           <button type="submit" onClick={toggleForms}>
             Login
           </button>
