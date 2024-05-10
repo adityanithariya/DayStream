@@ -52,10 +52,8 @@ const Signup: NextPage = () => {
   return isLoginActive ? (
     // Login
     <div className="flex justify-center items-center h-screen sm:w-300">
-      {' '}
       <div className="bg-gradient-to-b from-light-blue to-blue-500 w-auto flex flex-col items-center justify-center sm:h-auto py-10">
         <div className="max-w-md h-20 w-20 bg-light-blue rounded-md mb-8 flex items-center justify-center">
-          {' '}
           <Image
             className="p-3 text-xl"
             src="/icon-72x72.png"
@@ -111,39 +109,68 @@ const Signup: NextPage = () => {
     </div>
   ) : (
     // Sign Up
-    <div>
-      <form
-        onSubmit={(e) => {
-          e.preventDefault()
-          handleSignUp()
-        }}
-      >
-        <input
-          type="text"
-          placeholder="Username"
-          value={username}
-          onChange={handleUsernameChange}
-        />
-        <input
-          type="email"
-          placeholder="Email"
-          value={email}
-          onChange={handleEmailChange}
-        />
-        <input
-          type="password"
-          placeholder="Password"
-          value={password}
-          onChange={handlePasswordChange}
-        />
-        <Button type="submit">Signup</Button>
-        <p className="text-sm">
-          Already have an account?
-          <button type="submit" onClick={toggleForms}>
-            Login
+
+    <div className="flex justify-center items-center h-screen  ">
+      <div className="bg-gradient-to-b from-light-blue to-blue-500  flex flex-col items-center justify-center sm:h-auto py-10 ">
+        <div className="max-w-md h-20 w-20 bg-light-blue rounded-md mb-8 flex items-center justify-center">
+          <Image
+            className="p-3 text-xl"
+            src="/icon-72x72.png"
+            alt="logo"
+            height={96}
+            width={96}
+          />
+        </div>
+        <span className="text-white mb-8 text-2xl">DayStream</span>
+        <form
+          className="flex flex-col px-5 sm:h-auto"
+          onSubmit={(e) => {
+            e.preventDefault()
+            // Your signup form submission logic here (handleSignUp)
+          }}
+        >
+          <div className="flex flex-col space-y-6">
+            <input
+              className="custom-input"
+              type="text"
+              placeholder="Username"
+              value={username}
+              onChange={handleUsernameChange}
+            />
+            <input
+              className="custom-input"
+              type="email"
+              placeholder="Email"
+              value={email}
+              onChange={handleEmailChange}
+            />
+            <input
+              className="custom-input"
+              type="password"
+              placeholder="Password"
+              value={password}
+              onChange={handlePasswordChange}
+            />
+          </div>
+          <button
+            className="p-2 bg-white rounded-3xl text-dark-blue mt-8"
+            type="submit"
+            onClick={handleSignUp}
+          >
+            Sign Up
           </button>
-        </p>
-      </form>
+          <span className="text-white m-auto text-sm mb-8">
+            Forgot password?
+          </span>
+          {/* Remove "or continue with" for signup form */}
+          <p className="text-white mb-0 text-sm">
+            Already have an account?
+            <button className="text-sm" type="submit" onClick={toggleForms}>
+              Login
+            </button>
+          </p>
+        </form>
+      </div>
     </div>
   )
 }
