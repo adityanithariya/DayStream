@@ -21,6 +21,13 @@ const config = {
       textColor: {
         primary: '#03B5FB',
       },
+      colors: {
+        light: '#19ECF0',
+        dark: '#03B4FB',
+        'light-blue': '#40dff6',
+        'dark-blue': '#0eb1fb',
+        'custom-blue': '#2bc5fa',
+      },
       keyframes: {
         'accordion-down': {
           from: { height: '0' },

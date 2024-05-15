@@ -26,10 +26,11 @@ const initPassport = (app: ExpressApp) => {
         if (!email || !username || !password)
           return done(null, false, { message: 'Missing Credentials' })
         const exists = await User.findOne({ $or: [{ username }, { email }] })
-        if (exists) return done(null, false, { message: 'User already exists' })
+        if (exists)
+          return done(null, false, { message: 'Account already exists' })
         const newUser = new User({ username, email, password })
         await newUser.save()
-        return done(null, newUser.id, { message: 'User created' })
+        return done(null, newUser.id, { message: 'Welcome to DayStream!' })
       },
     ),
   )
@@ -47,10 +48,10 @@ const initPassport = (app: ExpressApp) => {
         }).select('+password')
         if (!user?.hasPassword)
           return done(null, false, { message: 'Account Created using Socials' })
-        if (!user) return done(null, false, { message: 'User not found' })
+        if (!user) return done(null, false, { message: 'Account not found' })
         const isValid = await user.isValidPassword(password)
         if (!isValid) return done(null, false, { message: 'Invalid password' })
-        return done(null, user.id, { message: 'User signed in' })
+        return done(null, user.id, { message: 'Welcome back!' })
       },
     ),
   )
@@ -58,7 +59,9 @@ const initPassport = (app: ExpressApp) => {
   passport.use(
     new JwtStrategy(
       {
-        jwtFromRequest: (req) => req.cookies.token,
+        jwtFromRequest: (req) => {
+          return req.headers.token
+        },
         secretOrKey: process.env.JWT_SECRET as string,
       },
       async (token, done) => {
@@ -74,7 +77,7 @@ const initPassport = (app: ExpressApp) => {
       {
         clientID: process.env.GOOGLE_CLIENT_ID as string,
         clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
-        callbackURL: process.env.GOOGLE_CALLBACK_URL as string,
+        callbackURL: `${process.env.CLIENT_BASE_URL}/auth/google/callback`,
       },
       async (_accessToken, _refreshToken, profile, cb) => {
         if (!profile.id) return cb(new Error('Google Sign-In Failed'))
@@ -110,15 +113,15 @@ export const pinAuth = async (
   res: Response,
   next: NextFunction,
 ) => {
-  if (!req?.headers?.pinAuth)
+  const pinAuth = req?.headers?.pinauth as string
+  if (!pinAuth)
     return res
       .status(401)
       .json({ error: 'PIN Unauthenticated', code: 'pin-auth-failed' })
   const user = await User.findById(req?.user?.id).select('+sessionId')
-  const pin = CryptoJS.AES.decrypt(
-    req?.headers?.pinAuth as string,
-    user?.sessionId as string,
-  ).toString(CryptoJS.enc.Utf8)
+  const pin = CryptoJS.AES.decrypt(pinAuth, user?.sessionId as string).toString(
+    CryptoJS.enc.Utf8,
+  )
 
   if (user?.isValidPin(pin)) next()
   else {

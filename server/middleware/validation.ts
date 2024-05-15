@@ -2,7 +2,9 @@ import type { NextFunction, Request, Response } from 'express'
 
 export const validateHasParameters = (...args: string[]) => {
   return (req: Request, res: Response, next: NextFunction) => {
-    const data = req.body
+    let data: any
+    if (req.method === 'POST') data = req.body
+    else data = req.query
     let valid = true
 
     for (const arg of args) {

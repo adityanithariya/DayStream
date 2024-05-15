@@ -1,3 +1,4 @@
+import { toastError } from '@lib/toast'
 import axios from 'axios'
 import type { AxiosInstance, InternalAxiosRequestConfig } from 'axios'
 import { usePathname, useRouter } from 'next/navigation'
@@ -18,7 +19,7 @@ const useAPI = () => {
     (config: InternalAxiosRequestConfig): InternalAxiosRequestConfig => {
       const token = localStorage.getItem('token')
       const authenticatedPIN = sessionStorage.getItem('pin-auth')
-      if (token) config.headers.Authorization = `Bearer ${token}`
+      if (token) config.headers.token = token
       if (authenticatedPIN) config.headers.pinAuth = authenticatedPIN
       return config
     },
@@ -30,9 +31,11 @@ const useAPI = () => {
       if (status === 401) {
         if (data?.code === 'pin-auth-failed')
           navigate.replace(`/pin?next=${pathname}`)
-        else navigate.replace(`/login?next=${pathname}`)
-      } else return Promise.reject(error)
-      return Promise.resolve(error)
+        else navigate.replace(`/auth/login?next=${pathname}`)
+      } else {
+        toastError(data?.message || 'An error occurred. Please try again.')
+        return Promise.reject(error)
+      }
     },
   )
   return API

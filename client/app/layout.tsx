@@ -1,8 +1,9 @@
+import ToastProvider from '@components/providers/ToastProvider'
 import type { Metadata, Viewport } from 'next'
-import { Poppins } from 'next/font/google'
+import { Nunito } from 'next/font/google'
 import './globals.css'
 
-const inter = Poppins({ subsets: ['latin'], weight: '400' })
+const nunito = Nunito({ subsets: ['latin'], weight: '400' })
 
 const APP_NAME = 'DayStream'
 const APP_DEFAULT_TITLE = 'DayStream - Track your day!'
@@ -55,8 +56,8 @@ export default function RootLayout({
   return (
     <html lang="en" dir="ltr">
       <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon" />
-      <body className={inter.className} suppressHydrationWarning>
-        {children}
+      <body className={nunito.className} suppressHydrationWarning>
+        <ToastProvider>{children}</ToastProvider>
       </body>
     </html>
   )
