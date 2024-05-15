@@ -9,6 +9,7 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import { useEffect, useRef, useState } from 'react'
 import { FaGithub } from 'react-icons/fa'
 import { FcGoogle } from 'react-icons/fc'
+import { FiEye, FiEyeOff } from 'react-icons/fi'
 import { IoIosCheckmark } from 'react-icons/io'
 import { RiKey2Line, RiUser3Line } from 'react-icons/ri'
 import { RxCross2 } from 'react-icons/rx'
@@ -30,6 +31,7 @@ const AuthPage: NextPage = ({ params }: AuthPageProps) => {
   const [username, setUsername] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [passwordShow, setPasswordShow] = useState(false)
   const [usernameAvailable, setUsernameAvailable] = useState(false)
   const iconStyle = 'py-3 px-3.5 size-12 bg-white rounded-full text-primary'
   const inputWrapperStyle =
@@ -150,9 +152,9 @@ const AuthPage: NextPage = ({ params }: AuthPageProps) => {
                 placeholder={placeholder}
                 value={username}
                 onChange={(e) => {
-                  setUsername(e.target.value)
+                  setUsername(e.target.value.trim())
                   if (action === Action.SIGNUP)
-                    handleUsernameCheck(e.target.value)
+                    handleUsernameCheck(e.target.value.trim())
                 }}
               />
               {username?.length && action === Action.SIGNUP ? (
@@ -171,19 +173,29 @@ const AuthPage: NextPage = ({ params }: AuthPageProps) => {
                   className={inputStyle}
                   placeholder="Email"
                   value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  onChange={(e) => setEmail(e.target.value.trim())}
                 />
               </div>
             ) : null}
             <div className={inputWrapperStyle}>
               <RiKey2Line className="py-3 px-3.5 size-12 bg-white rounded-full text-primary" />
               <input
-                type="password"
+                type={passwordShow ? 'text' : 'password'}
                 className={inputStyle}
                 placeholder="Password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
               />
+              <button
+                type="button"
+                onClick={() => setPasswordShow(!passwordShow)}
+              >
+                {passwordShow ? (
+                  <FiEye className="text-white size-6 mx-3 my-auto" />
+                ) : (
+                  <FiEyeOff className="text-white size-6 mx-3 my-auto" />
+                )}
+              </button>
             </div>
           </div>
           <button
