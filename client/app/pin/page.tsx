@@ -77,7 +77,7 @@ const PINLogin = () => {
 
   const box = useRef<HTMLElement>(null)
   const navigate = useRouter()
-  const api = useAPI()
+  const api = useAPI(true)
   const verifyPin = async () => {
     setLoading(true)
 
@@ -105,6 +105,9 @@ const PINLogin = () => {
 
     setLoading(false)
   }
+  useEffect(() => {
+    if (pin.length === 6) verifyPin()
+  }, [pin, verifyPin])
   return (
     <main
       ref={box}
@@ -126,7 +129,6 @@ const PINLogin = () => {
         pattern={REGEXP_ONLY_DIGITS}
         value={pin}
         onChange={setPin}
-        onComplete={verifyPin}
       >
         <InputOTPGroup>
           <InputOTPSlot index={0} />

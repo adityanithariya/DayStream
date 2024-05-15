@@ -8,13 +8,7 @@ const ProtectedGroup = ({
 }: Readonly<{
   children: ReactNode
 }>) => {
-  const api = useAPI()
-  useEffect(() => {
-    ;(async () => {
-      await api.get('/auth/protect')
-    })()
-  }, [api.get])
-
+  useAPI(true)
   return <div>{children}</div>
 }
 

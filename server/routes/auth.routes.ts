@@ -23,12 +23,14 @@ authRouter.get(
 authRouter.get(
   '/google/callback',
   passport.authenticate('google', {
-    failureRedirect: `${process.env.CLIENT_BASE_URL}/login?error=google-auth-failed`,
+    failureRedirect: `${process.env.CLIENT_BASE_URL}/auth/google?error=google-auth-failed`,
     session: false,
   }),
   (req: Request, res: Response) => {
     res.redirect(
-      `${process.env.CLIENT_BASE_URL}/login/${signJWT(req.user as IUser)}`,
+      `${process.env.CLIENT_BASE_URL}/auth/google?token=${signJWT(
+        req.user as IUser,
+      )}`,
     )
   },
 )
@@ -42,8 +44,9 @@ authRouter.post('/google/success', (req: Request, res: Response) => {
 authRouter.get(
   '/username',
   validateHasParameters('username'),
-  (req: Request, res: Response) => {
-    const user = User.findOne({ username: req.body?.username })
+  async (req: Request, res: Response) => {
+    const { username } = req.query
+    const user = await User.findOne({ username })
     if (!user) res.status(200).json({ available: true })
     else res.status(200).json({ available: false })
   },

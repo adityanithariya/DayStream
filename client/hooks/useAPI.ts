@@ -1,8 +1,10 @@
+import { toastError } from '@lib/toast'
 import axios from 'axios'
 import type { AxiosInstance, InternalAxiosRequestConfig } from 'axios'
-import { usePathname, useRouter } from 'next/navigation'
+import { usePathname, useRouter, useSearchParams } from 'next/navigation'
+import { useEffect } from 'react'
 
-const useAPI = () => {
+const useAPI = (checkAuth?: boolean) => {
   const API: AxiosInstance = axios.create({
     baseURL: process.env.SERVER_BASE_URL as string,
     headers: {
@@ -18,7 +20,7 @@ const useAPI = () => {
     (config: InternalAxiosRequestConfig): InternalAxiosRequestConfig => {
       const token = localStorage.getItem('token')
       const authenticatedPIN = sessionStorage.getItem('pin-auth')
-      if (token) config.headers.Authorization = `Bearer ${token}`
+      if (token) config.headers.token = token
       if (authenticatedPIN) config.headers.pinAuth = authenticatedPIN
       return config
     },
@@ -28,13 +30,27 @@ const useAPI = () => {
     (error: any) => {
       const { status, data } = error.response
       if (status === 401) {
-        if (data?.code === 'pin-auth-failed')
+        if (data?.code === 'pin-auth-failed' && pathname !== '/pin')
           navigate.replace(`/pin?next=${pathname}`)
-        else navigate.replace(`/login?next=${pathname}`)
-      } else return Promise.reject(error)
-      return Promise.resolve(error)
+        else if (!pathname.startsWith('/auth'))
+          navigate.replace(`/auth/login?next=${pathname}`)
+      } else {
+        toastError(data?.message || 'An error occurred. Please try again.')
+        return Promise.reject(error)
+      }
     },
   )
+  const searchParams = useSearchParams()
+  useEffect(() => {
+    if (!checkAuth) return
+    const next = searchParams.get('next')
+    API.post('/auth/check')
+      .then((res) => {
+        console.log(res.data.username)
+        navigate.replace(next || '/')
+      })
+      .catch(() => {})
+  }, [])
   return API
 }
 

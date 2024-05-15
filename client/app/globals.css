@@ -1,3 +1,8 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+input::selection {
+    color: #03B5FB;
+    background-color: white;
+}

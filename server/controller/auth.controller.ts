@@ -18,8 +18,11 @@ export const signUp = async (
           .status(500)
           .json({ message: 'Internal Server Error', error: err.message })
       if (!userId) return res.status(400).json(info)
-      res.cookie('token', signJWT(userId), tokenConfig)
-      res.status(201).json({ ...info, user: await User.findById(userId) })
+      res.status(201).json({
+        ...info,
+        user: await User.findById(userId),
+        token: signJWT(userId),
+      })
     },
   )(req, res, next)
 }
@@ -34,8 +37,11 @@ export const signIn = async (req: Request, res: Response) => {
           .status(500)
           .json({ message: 'Internal Server Error', error: err.message })
       if (!userId) return res.status(400).json(info)
-      res.cookie('token', signJWT(userId), tokenConfig)
-      res.status(200).json({ ...info, user: await User.findById(userId) })
+      res.status(200).json({
+        ...info,
+        user: await User.findById(userId),
+        token: signJWT(userId),
+      })
     },
   )(req, res)
 }

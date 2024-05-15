@@ -15,7 +15,7 @@ import { connect } from 'mongoose'
 import passport from 'passport'
 
 const app = express()
-const port = process.env.PORT || 5000
+const port: number = Number(process.env.PORT) || 5000
 
 initPassport(app)
 
