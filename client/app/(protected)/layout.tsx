@@ -1,14 +1,12 @@
 'use client'
 
-import useAPI from '@hooks/useAPI'
-import React, { type ReactNode, useEffect } from 'react'
+import React, { type ReactNode } from 'react'
 
 const ProtectedGroup = ({
   children,
 }: Readonly<{
   children: ReactNode
 }>) => {
-  useAPI(true)
   return <div>{children}</div>
 }
 

@@ -2,9 +2,8 @@ import { toastError } from '@lib/toast'
 import axios from 'axios'
 import type { AxiosInstance, InternalAxiosRequestConfig } from 'axios'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
-import { useEffect } from 'react'
 
-const useAPI = (checkAuth?: boolean) => {
+const useAPI = () => {
   const API: AxiosInstance = axios.create({
     baseURL: process.env.SERVER_BASE_URL as string,
     headers: {
@@ -30,7 +29,7 @@ const useAPI = (checkAuth?: boolean) => {
     (error: any) => {
       const { status, data } = error.response
       if (status === 401) {
-        if (data?.code === 'pin-auth-failed' && pathname !== '/pin')
+        if (data?.code === 'pin-auth-failed' && !pathname.startsWith('/pin'))
           navigate.replace(`/pin?next=${pathname}`)
         else if (!pathname.startsWith('/auth'))
           navigate.replace(`/auth/login?next=${pathname}`)
@@ -40,17 +39,6 @@ const useAPI = (checkAuth?: boolean) => {
       }
     },
   )
-  const searchParams = useSearchParams()
-  useEffect(() => {
-    if (!checkAuth) return
-    const next = searchParams.get('next')
-    API.post('/auth/check')
-      .then((res) => {
-        console.log(res.data.username)
-        navigate.replace(next || '/')
-      })
-      .catch(() => {})
-  }, [])
   return API
 }
 

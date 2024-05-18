@@ -1,118 +1,59 @@
 'use client'
 
 import authVector from '@assets/auth-vector.svg'
+import SocialAuthCheck from '@components/SocialAuthCheck'
+import { Badge } from '@components/ui/badge'
 import { buttonVariants } from '@components/ui/button'
 import useAPI from '@hooks/useAPI'
 import { toastError, toastSuccess } from '@lib/toast'
+import useAuthStore from '@store/useAuthStore'
+import { Action, type AuthPageProps } from '@type/auth'
 import clsx from 'clsx'
 import type { NextPage, Viewport } from 'next'
 import Image from 'next/image'
 import Link from 'next/link'
-import { useRouter, useSearchParams } from 'next/navigation'
-import { useEffect, useRef, useState } from 'react'
-// import { FaGithub } from 'react-icons/fa'
+import { useRouter } from 'next/navigation'
+import { Suspense, useRef } from 'react'
 import { FcGoogle } from 'react-icons/fc'
 import { FiEye, FiEyeOff } from 'react-icons/fi'
 import { IoIosCheckmark } from 'react-icons/io'
 import { MdAlternateEmail, MdOutlineEmail } from 'react-icons/md'
-import { RiKey2Line, RiUser3Line } from 'react-icons/ri'
+import { RiKey2Line } from 'react-icons/ri'
 import { RxCross2 } from 'react-icons/rx'
+// import { FaGithub } from 'react-icons/fa'
 
 export const viewport: Viewport = {
   themeColor: '#03B4FB',
 }
 
-enum Action {
-  LOGIN = 'login',
-  SIGNUP = 'signup',
-  GOOGLE = 'google',
-  GITHUB = 'github',
-}
-
-type AuthPageProps = {
-  params?: {
-    action?: Action
-  }
-}
-
-type AuthState = {
-  username: {
-    value: string
-    requiredError: boolean
-    usernameAvailable: boolean
-  }
-  email: { value: string; requiredError: boolean }
-  password: { value: string; requiredError: boolean; showPassword: boolean }
-}
-
 const AuthPage: NextPage = ({ params }: AuthPageProps) => {
-  const [
-    {
-      username: { value: username, usernameAvailable },
-      email: { value: email },
-      password: { showPassword, value: password },
-    },
-    setData,
-  ] = useState<AuthState>({
+  const {
     username: {
-      value: '',
-      requiredError: false,
-      usernameAvailable: false,
+      value: username,
+      usernameAvailable,
+      requiredError: usernameError,
     },
-    email: {
-      value: '',
-      requiredError: false,
-    },
-    password: {
-      value: '',
-      requiredError: false,
-      showPassword: false,
-    },
-  })
-  const setUsername = (value: string) =>
-    setData((data) => ({ ...data, username: { ...data.username, value } }))
-  const setEmail = (value: string) =>
-    setData((data) => ({ ...data, email: { ...data.email, value } }))
-  const setPassword = (value: string) =>
-    setData((data) => ({ ...data, password: { ...data.password, value } }))
-  const setShowPassword = (value: boolean) =>
-    setData((data) => ({
-      ...data,
-      password: { ...data.password, showPassword: value },
-    }))
-  const setUsernameAvailable = (value: boolean) =>
-    setData((data) => ({
-      ...data,
-      username: { ...data.username, usernameAvailable: value },
-    }))
+    email: { value: email, requiredError: emailError },
+    password: { value: password, showPassword, requiredError: passwordError },
+    setUsername,
+    setEmail,
+    setPassword,
+    setShowPassword,
+    setUsernameAvailable,
+    setRequiredError,
+  } = useAuthStore()
+
+  // Classes
   const iconStyle =
     'p-4 size-[3.25rem] h-fit bg-white rounded-full text-primary'
   const inputWrapperStyle =
-    'flex w-full rounded-full bg-transparent border border-white placeholder-white focus:border-white focus:outline-none'
+    'flex w-full rounded-full mt-4 bg-transparent border border-white placeholder-white focus:border-white focus:outline-none'
   const inputStyle =
     'w-full p-2 rounded-3xl text-sm bg-transparent placeholder-white focus:border-white focus:outline-none text-white'
-  const action = params?.action
+  const action = params?.action as Action
   const placeholder = action === Action.LOGIN ? 'Username or Email' : 'Username'
-  const searchParams = useSearchParams()
-  const navigate = useRouter()
-  const api = useAPI(true)
-
-  useEffect(() => {
-    if (action !== Action.GOOGLE && action !== Action.GITHUB) return
-    if (searchParams.has('error')) {
-      if (searchParams.get('error') === 'google-auth-failed')
-        toastError('Google authentication failed. Please try again.')
-      else if (searchParams.get('error') === 'github-auth-failed')
-        toastError('GitHub authentication failed. Please try again.')
-      return navigate.replace('/auth/login')
-    }
-    const token = searchParams.get('token')
-    const next = searchParams.get('next')
-    api.post(`/auth/${action}/success`, { token }).then((res) => {
-      toastSuccess(res.data.message)
-      if (res.data.success) navigate.replace(next || '/')
-    })
-  }, [action, searchParams, navigate, api.post])
+  const { replace } = useRouter()
+  const { get, post } = useAPI()
 
   const checkUsername = useRef<NodeJS.Timeout | null>(null)
   const handleUsernameCheck = (username: string) => {
@@ -121,7 +62,7 @@ const AuthPage: NextPage = ({ params }: AuthPageProps) => {
     checkUsername.current = setTimeout(async () => {
       // setIsLoading(true)
       try {
-        const { data } = await api.get('/auth/username', {
+        const { data } = await get('/auth/username', {
           params: { username },
         })
 
@@ -136,27 +77,38 @@ const AuthPage: NextPage = ({ params }: AuthPageProps) => {
   }
 
   const handleAuth = () => {
-    if (!username || !password) return toastError('Please fill in all fields')
+    let validation = true
+    if (!username) {
+      validation = false
+      setRequiredError('username', true)
+    }
+    if (action === Action.SIGNUP && !email) {
+      validation = false
+      setRequiredError('email', true)
+    }
+    if (!password) {
+      validation = false
+      setRequiredError('password', true)
+    }
+    if (!validation) return
     if (action === Action.LOGIN) {
-      api
-        .post('/auth/signin', { identity: username, password })
+      post('/auth/signin', { identity: username, password })
         .then((res) => {
           console.log(res.data?.token)
           toastSuccess(res.data.message)
           localStorage.setItem('token', res?.data?.token)
-          navigate.replace('/')
+          replace('/')
         })
         .catch((err) => {
           toastError(err.response.data.message)
         })
     } else if (action === Action.SIGNUP) {
-      api
-        .post('/auth/signup', { username, email, password })
+      post('/auth/signup', { username, email, password })
         .then((res) => {
           console.log(res.data?.token)
           toastSuccess(res.data.message)
           localStorage.setItem('token', res?.data?.token)
-          navigate.replace('/')
+          replace('/')
         })
         .catch((err) => {
           toastError(err.response.data.message)
@@ -166,6 +118,9 @@ const AuthPage: NextPage = ({ params }: AuthPageProps) => {
 
   return (
     <div className="relative flex justify-center items-center h-screen bg-gradient-to-b from-light to-dark from-1%">
+      <Suspense>
+        <SocialAuthCheck action={action} />
+      </Suspense>
       <Image
         src={authVector}
         alt="vector"
@@ -182,14 +137,14 @@ const AuthPage: NextPage = ({ params }: AuthPageProps) => {
             width={68}
           />
         </div>
-        <span className="text-white mb-8 text-2xl">DayStream</span>
+        <span className="text-white mb-6 text-2xl">DayStream</span>
         <form
           className="flex flex-col px-10 sm:h-auto w-full"
           onSubmit={(e) => {
             e.preventDefault()
           }}
         >
-          <div className="flex flex-col space-y-4">
+          <div className="flex flex-col">
             <div className={inputWrapperStyle}>
               <MdAlternateEmail className={iconStyle} />
               <input
@@ -198,6 +153,7 @@ const AuthPage: NextPage = ({ params }: AuthPageProps) => {
                 placeholder={placeholder}
                 value={username}
                 onChange={(e) => {
+                  setRequiredError('username', false)
                   setUsername(e.target.value.trim())
                   if (action === Action.SIGNUP)
                     handleUsernameCheck(e.target.value.trim())
@@ -211,17 +167,32 @@ const AuthPage: NextPage = ({ params }: AuthPageProps) => {
                 )
               ) : null}
             </div>
+            {usernameError && (
+              <Badge className="!w-fit mt-2 !text-[#ff0000c0] !bg-[#ffffff90]">
+                Username is required
+              </Badge>
+            )}
             {action === Action.SIGNUP ? (
-              <div className={inputWrapperStyle}>
-                <MdOutlineEmail className={iconStyle} />
-                <input
-                  type="text"
-                  className={inputStyle}
-                  placeholder="Email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value.trim())}
-                />
-              </div>
+              <>
+                <div className={inputWrapperStyle}>
+                  <MdOutlineEmail className={iconStyle} />
+                  <input
+                    type="text"
+                    className={inputStyle}
+                    placeholder="Email"
+                    value={email}
+                    onChange={(e) => {
+                      setRequiredError('email', false)
+                      setEmail(e.target.value.trim())
+                    }}
+                  />
+                </div>
+                {emailError && (
+                  <Badge className="!w-fit mt-2 !text-[#ff0000c0] !bg-[#ffffff90]">
+                    Email is required
+                  </Badge>
+                )}
+              </>
             ) : null}
             <div className={inputWrapperStyle}>
               <RiKey2Line className="py-4 px-4 size-[3.5rem] h-fit bg-white rounded-[100px] text-primary" />
@@ -230,7 +201,10 @@ const AuthPage: NextPage = ({ params }: AuthPageProps) => {
                 className={inputStyle}
                 placeholder="Password"
                 value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                onChange={(e) => {
+                  setRequiredError('password', false)
+                  setPassword(e.target.value)
+                }}
               />
               <button
                 type="button"
@@ -243,6 +217,11 @@ const AuthPage: NextPage = ({ params }: AuthPageProps) => {
                 )}
               </button>
             </div>
+            {passwordError && (
+              <Badge className="!w-fit mt-2 !text-[#ff0000c0] !bg-[#ffffff90]">
+                Password is required
+              </Badge>
+            )}
           </div>
           <button
             className="p-2 py-3.5 my-5 bg-white rounded-3xl text-primary font-bold text-sm mt-8 uppercase shadow-[0px_6px_15px_0px_#ffffff7d] focus-visible:bg-slate-100 hover:bg-slate-100"

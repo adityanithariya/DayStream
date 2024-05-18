@@ -12,7 +12,13 @@ import { AES } from 'crypto-js'
 import { REGEXP_ONLY_DIGITS } from 'input-otp'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import React, { type ReactElement, useState, useRef, useEffect } from 'react'
+import React, {
+  type ReactElement,
+  useState,
+  useRef,
+  useEffect,
+  useCallback,
+} from 'react'
 import { FaShield } from 'react-icons/fa6'
 import { IoIosArrowRoundBack } from 'react-icons/io'
 
@@ -76,15 +82,16 @@ const PINLogin = () => {
   ]
 
   const box = useRef<HTMLElement>(null)
-  const navigate = useRouter()
-  const api = useAPI(true)
-  const verifyPin = async () => {
+  const { replace } = useRouter()
+  const { post } = useAPI()
+
+  const verifyPin = useCallback(async () => {
     setLoading(true)
 
     try {
       const {
         data: { valid, sessionId },
-      } = await api.post<VerifyPINType>('/u/pin/verify', { pin })
+      } = await post<VerifyPINType>('/u/pin/verify', { pin })
 
       if (valid) {
         setIsValid(valid)
@@ -94,17 +101,17 @@ const PINLogin = () => {
           AES.encrypt(pin, sessionId).toString(),
         )
         setTimeout(() => {
-          navigate.replace('/')
+          replace('/')
         }, 500)
         box.current?.classList.add('animate-verified')
       }
     } catch (err: any) {
       console.log(err)
-      if (err?.response?.status === 401) navigate.replace('/login')
+      if (err?.response?.status === 401) replace('/login')
     }
 
     setLoading(false)
-  }
+  }, [pin, post, replace])
   useEffect(() => {
     if (pin.length === 6) verifyPin()
   }, [pin, verifyPin])
