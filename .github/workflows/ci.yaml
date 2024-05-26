@@ -29,6 +29,9 @@ jobs:
               run: |
                   cd server
                   mv dist/* .
+                  rm tsconfig.json
+                  OUT=$(jq '.scripts |= del(.build)' --raw-output package.json)
+                  echo $OUT > package.json
             - name: Deploy
               uses: s0/git-publish-subdir-action@develop
               env:
