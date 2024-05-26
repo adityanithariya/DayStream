@@ -1,16 +1,15 @@
 {
   "version": 2,
-  "builds": [
+  "rewrites": [
     {
-      "src": "app.js",
-      "use": "@vercel/node",
-      "config": { "includeFiles": ["dist/**", "node_modules/**"] }
+      "source": "/(.*)",
+      "destination": "app.js"
     }
   ],
-  "routes": [
-    {
-      "src": "/(.*)",
-      "dest": "app.js"
+  "functions": {
+    "**/*.js": {
+      "includeFiles": "(dist|node_modules)/**",
+      "maxDuration": 60
     }
-  ]
+  }
 }
