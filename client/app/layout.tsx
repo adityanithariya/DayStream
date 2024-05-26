@@ -1,9 +1,11 @@
 import CheckAuth from '@components/CheckAuth'
 import ToastProvider from '@components/providers/ToastProvider'
-import type { Metadata, Viewport } from 'next'
 import { Nunito } from 'next/font/google'
-import { Suspense } from 'react'
 import './globals.css'
+
+import type { CommonProps } from '@type/common'
+import type { Metadata, Viewport } from 'next'
+import { Suspense } from 'react'
 
 const nunito = Nunito({ subsets: ['latin'], weight: '400' })
 
@@ -59,12 +61,10 @@ export default function RootLayout({
     <html lang="en" dir="ltr">
       <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon" />
       <body className={nunito.className} suppressHydrationWarning>
-        <ToastProvider>
-          <Suspense>
-            <CheckAuth />
-          </Suspense>
-          {children}
-        </ToastProvider>
+        <Suspense>
+          <CheckAuth />
+        </Suspense>
+        <ToastProvider>{children}</ToastProvider>
       </body>
     </html>
   )

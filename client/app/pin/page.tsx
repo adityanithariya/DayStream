@@ -22,6 +22,9 @@ import React, {
 import { FaShield } from 'react-icons/fa6'
 import { IoIosArrowRoundBack } from 'react-icons/io'
 
+import type { CommonProps } from '@type/common'
+import type { NextPage } from 'next'
+
 const PINButton = ({
   value,
   setPin,
@@ -62,9 +65,9 @@ type VerifyPINType = {
   sessionId: string
 }
 
-const PINLogin = () => {
+const PINLogin: NextPage = ({ searchParams }: CommonProps) => {
   const [pin, setPin] = useState<string>('')
-  const [isValid, setIsValid] = useState(false)
+  const [isValid, setIsValid] = useState(true)
   const [loading, setLoading] = useState(false)
   const keypad = [
     { id: 1, value: 1 },
@@ -84,24 +87,22 @@ const PINLogin = () => {
   const box = useRef<HTMLElement>(null)
   const { replace } = useRouter()
   const { post } = useAPI()
+  const next = searchParams?.next
 
   const verifyPin = useCallback(async () => {
-    setLoading(true)
-
     try {
       const {
         data: { valid, sessionId },
       } = await post<VerifyPINType>('/u/pin/verify', { pin })
+      setIsValid(valid)
 
       if (valid) {
-        setIsValid(valid)
-
         sessionStorage.setItem(
           'pin-auth',
           AES.encrypt(pin, sessionId).toString(),
         )
         setTimeout(() => {
-          replace('/')
+          replace(next || '/')
         }, 500)
         box.current?.classList.add('animate-verified')
       }
@@ -109,12 +110,8 @@ const PINLogin = () => {
       console.log(err)
       if (err?.response?.status === 401) replace('/login')
     }
+  }, [pin, post, replace, next])
 
-    setLoading(false)
-  }, [pin, post, replace])
-  useEffect(() => {
-    if (pin.length === 6) verifyPin()
-  }, [pin, verifyPin])
   return (
     <main
       ref={box}
@@ -136,6 +133,11 @@ const PINLogin = () => {
         pattern={REGEXP_ONLY_DIGITS}
         value={pin}
         onChange={setPin}
+        onComplete={async () => {
+          setLoading(true)
+          await verifyPin()
+          setLoading(false)
+        }}
       >
         <InputOTPGroup>
           <InputOTPSlot index={0} />

@@ -5,24 +5,17 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import { useEffect } from 'react'
 
 const CheckAuth = () => {
-  const { post } = useAPI()
-  const searchParams = useSearchParams()
+  const { get } = useAPI()
   const { replace } = useRouter()
+  const next = useSearchParams().get('next')
   useEffect(() => {
-    const next = new URLSearchParams(searchParams).get('next')
-    try {
-      post('/auth/check')
-        .then((res) => {
-          console.log(res.data.username)
-          replace(next || '/')
-        })
-        .catch((err) => {
-          console.log(err)
-        })
-    } catch (err) {
-      console.log(err)
-    }
-  }, [searchParams, post, replace])
+    get('/auth/protect')
+      .then((res) => {
+        console.log(res?.data?.username)
+        replace(next || '/')
+      })
+      .catch((_err) => {})
+  }, [next, get, replace])
   return null
 }
 

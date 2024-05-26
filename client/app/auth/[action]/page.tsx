@@ -1,19 +1,19 @@
 'use client'
 
 import authVector from '@assets/auth-vector.svg'
-import SocialAuthCheck from '@components/SocialAuthCheck'
 import { Badge } from '@components/ui/badge'
 import { buttonVariants } from '@components/ui/button'
 import useAPI from '@hooks/useAPI'
 import { toastError, toastSuccess } from '@lib/toast'
 import useAuthStore from '@store/useAuthStore'
 import { Action, type AuthPageProps } from '@type/auth'
+import type { CommonProps } from '@type/common'
 import clsx from 'clsx'
 import type { NextPage, Viewport } from 'next'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { Suspense, useRef } from 'react'
+import { Suspense, useEffect, useRef } from 'react'
 import { FcGoogle } from 'react-icons/fc'
 import { FiEye, FiEyeOff } from 'react-icons/fi'
 import { IoIosCheckmark } from 'react-icons/io'
@@ -26,7 +26,11 @@ export const viewport: Viewport = {
   themeColor: '#03B4FB',
 }
 
-const AuthPage: NextPage = ({ params }: AuthPageProps) => {
+const AuthPage: NextPage = ({
+  params,
+  searchParams,
+}: AuthPageProps & CommonProps) => {
+  const next = searchParams?.next
   const {
     username: {
       value: username,
@@ -60,7 +64,6 @@ const AuthPage: NextPage = ({ params }: AuthPageProps) => {
     if (checkUsername.current) clearTimeout(checkUsername.current) // Clear any existing timeout
 
     checkUsername.current = setTimeout(async () => {
-      // setIsLoading(true)
       try {
         const { data } = await get('/auth/username', {
           params: { username },
@@ -70,8 +73,6 @@ const AuthPage: NextPage = ({ params }: AuthPageProps) => {
       } catch (error) {
         console.error('Error checking username availability:', error)
         setUsernameAvailable(false) // Assume unavailable on error (optional)
-      } finally {
-        // setIsLoading(false)
       }
     }, 500)
   }
@@ -94,10 +95,9 @@ const AuthPage: NextPage = ({ params }: AuthPageProps) => {
     if (action === Action.LOGIN) {
       post('/auth/signin', { identity: username, password })
         .then((res) => {
-          console.log(res.data?.token)
           toastSuccess(res.data.message)
           localStorage.setItem('token', res?.data?.token)
-          replace('/')
+          replace(next || '/')
         })
         .catch((err) => {
           toastError(err.response.data.message)
@@ -105,10 +105,9 @@ const AuthPage: NextPage = ({ params }: AuthPageProps) => {
     } else if (action === Action.SIGNUP) {
       post('/auth/signup', { username, email, password })
         .then((res) => {
-          console.log(res.data?.token)
           toastSuccess(res.data.message)
           localStorage.setItem('token', res?.data?.token)
-          replace('/')
+          replace(next || '/')
         })
         .catch((err) => {
           toastError(err.response.data.message)
@@ -116,11 +115,26 @@ const AuthPage: NextPage = ({ params }: AuthPageProps) => {
     }
   }
 
+  useEffect(() => {
+    const error = searchParams?.error
+    if (action !== Action.GOOGLE && action !== Action.GITHUB) return
+    if (error) {
+      if (error === 'google-auth-failed')
+        toastError('Google authentication failed. Please try again.')
+      else if (error === 'github-auth-failed')
+        toastError('GitHub authentication failed. Please try again.')
+      return replace('/auth/login')
+    }
+    const token = searchParams?.token
+    const next = searchParams?.next
+    post(`/auth/${action}/success`, { token }).then((res) => {
+      toastSuccess(res?.data?.message)
+      if (res?.data?.success) replace(next || '/')
+    })
+  }, [action, searchParams, replace, post])
+
   return (
     <div className="relative flex justify-center items-center h-screen bg-gradient-to-b from-light to-dark from-1%">
-      <Suspense>
-        <SocialAuthCheck action={action} />
-      </Suspense>
       <Image
         src={authVector}
         alt="vector"
