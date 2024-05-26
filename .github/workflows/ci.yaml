@@ -32,7 +32,9 @@ jobs:
                   mkdir dist
                   mv build/* ./dist
                   rm tsconfig.json
-                  OUT=$(jq '.scripts |= del(.build)' --raw-output package.json)
+                  OUT=$(jq '.scripts |= del(.build)' package.json)
+                  echo $OUT > package.json
+                  OUT=$(jq '.scripts.start = "node ./app.js"' package.json)
                   echo $OUT > package.json
             - name: Deploy
               uses: s0/git-publish-subdir-action@develop

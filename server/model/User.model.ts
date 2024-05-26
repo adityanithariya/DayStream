@@ -1,4 +1,4 @@
-import { compare, genSalt, hash } from 'bcrypt'
+import { compare, genSalt, hash } from 'bcryptjs'
 import { type Document, Schema, model } from 'mongoose'
 
 export interface IUser extends Document {
