@@ -49,7 +49,7 @@ const express_1 = __importDefault(require("express"));
 const mongoose_1 = require("mongoose");
 const passport_1 = __importDefault(require("passport"));
 const app = (0, express_1.default)();
-const port = process.env.PORT || 5000;
+const port = Number(process.env.PORT) || 5000;
 (0, auth_1.default)(app);
 const allowedOrigins = [
     'http://localhost:3000',
@@ -72,4 +72,3 @@ app.listen(port, () => __awaiter(void 0, void 0, void 0, function* () {
     yield (0, mongoose_1.connect)(process.env.MONGO_URI);
     console.log(`Server listening on http://localhost:${port}`);
 }));
-exports.default = app;

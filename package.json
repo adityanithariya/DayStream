@@ -2,7 +2,7 @@
   "name": "server",
   "version": "1.0.0",
   "description": "",
-  "main": "./app.ts",
+  "main": "./dist/app.ts",
   "dependencies": {
     "bcrypt": "^5.1.1",
     "cookie-parser": "^1.4.6",
@@ -11,6 +11,7 @@
     "dotenv": "^16.4.5",
     "express": "^4.19.2",
     "jsonwebtoken": "^9.0.2",
+    "module-alias": "^2.2.3",
     "mongoose": "^8.3.3",
     "passport": "^0.7.0",
     "passport-google-oauth20": "^2.0.0",
@@ -32,15 +33,13 @@
     "@types/passport-google-oauth20": "^2.0.14",
     "@types/passport-jwt": "^4.0.1",
     "@types/passport-local": "^1.0.38",
-    "module-alias": "^2.2.3",
     "nodemon": "^3.1.0",
-    "rimraf": "^5.0.5",
     "ts-node": "^10.9.2"
   },
   "scripts": {
     "dev": "nodemon",
-    "build": "rimraf dist && tsc -p tsconfig.json",
-    "start": "node ./app.js"
+    "build": "tsc -p tsconfig.json",
+    "start": "node ./dist/app.js"
   },
   "repository": {
     "type": "git",
@@ -53,10 +52,10 @@
   },
   "homepage": "https://github.com/adityanithariya/Daystream#readme",
   "_moduleAliases": {
-    "@controller": "controller",
-    "@model": "model",
-    "@routes": "routes",
-    "@middleware": "middleware",
-    "@utils": "utils"
+    "@controller": "dist/controller",
+    "@model": "dist/model",
+    "@routes": "dist/routes",
+    "@middleware": "dist/middleware",
+    "@utils": "dist/utils"
   }
 }

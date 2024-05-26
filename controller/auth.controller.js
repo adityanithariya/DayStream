@@ -1,27 +1,4 @@
 "use strict";
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
-    __setModuleDefault(result, mod);
-    return result;
-};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -37,7 +14,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.checkAuth = exports.signOut = exports.signIn = exports.signUp = void 0;
 const User_model_1 = __importDefault(require("@model/User.model"));
-const signJWT_1 = __importStar(require("@utils/signJWT"));
+const signJWT_1 = __importDefault(require("@utils/signJWT"));
 const passport_1 = __importDefault(require("passport"));
 const signUp = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     passport_1.default.authenticate('signup', { session: false }, (err, userId, info) => __awaiter(void 0, void 0, void 0, function* () {
@@ -47,8 +24,7 @@ const signUp = (req, res, next) => __awaiter(void 0, void 0, void 0, function* (
                 .json({ message: 'Internal Server Error', error: err.message });
         if (!userId)
             return res.status(400).json(info);
-        res.cookie('token', (0, signJWT_1.default)(userId), signJWT_1.tokenConfig);
-        res.status(201).json(Object.assign(Object.assign({}, info), { user: yield User_model_1.default.findById(userId) }));
+        res.status(201).json(Object.assign(Object.assign({}, info), { user: yield User_model_1.default.findById(userId), token: (0, signJWT_1.default)(userId) }));
     }))(req, res, next);
 });
 exports.signUp = signUp;
@@ -60,8 +36,7 @@ const signIn = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
                 .json({ message: 'Internal Server Error', error: err.message });
         if (!userId)
             return res.status(400).json(info);
-        res.cookie('token', (0, signJWT_1.default)(userId), signJWT_1.tokenConfig);
-        res.status(200).json(Object.assign(Object.assign({}, info), { user: yield User_model_1.default.findById(userId) }));
+        res.status(200).json(Object.assign(Object.assign({}, info), { user: yield User_model_1.default.findById(userId), token: (0, signJWT_1.default)(userId) }));
     }))(req, res);
 });
 exports.signIn = signIn;
