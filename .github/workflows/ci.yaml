@@ -28,7 +28,9 @@ jobs:
             - name: Copy build artifacts to root directory
               run: |
                   cd server
-                  mv dist/* .
+                  mv build/*.* .
+                  mkdir dist
+                  mv build/* ./dist
                   rm tsconfig.json
                   OUT=$(jq '.scripts |= del(.build)' --raw-output package.json)
                   echo $OUT > package.json
