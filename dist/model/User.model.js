@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const bcrypt_1 = require("bcrypt");
+const bcryptjs_1 = require("bcryptjs");
 const mongoose_1 = require("mongoose");
 const userSchema = new mongoose_1.Schema({
     username: {
@@ -58,9 +58,9 @@ const userSchema = new mongoose_1.Schema({
 userSchema.pre('save', function (next) {
     return __awaiter(this, void 0, void 0, function* () {
         if (this.isModified('password') && this.password)
-            this.password = yield (0, bcrypt_1.hash)(this.password, yield (0, bcrypt_1.genSalt)(10));
+            this.password = yield (0, bcryptjs_1.hash)(this.password, yield (0, bcryptjs_1.genSalt)(10));
         if (this.isModified('pin') && this.pin)
-            this.pin = yield (0, bcrypt_1.hash)(this.pin, yield (0, bcrypt_1.genSalt)(10));
+            this.pin = yield (0, bcryptjs_1.hash)(this.pin, yield (0, bcryptjs_1.genSalt)(10));
         next();
     });
 });
@@ -68,7 +68,7 @@ userSchema.methods.isValidPassword = function (password) {
     return __awaiter(this, void 0, void 0, function* () {
         if (!this.password)
             return false;
-        return yield (0, bcrypt_1.compare)(password, this.password);
+        return yield (0, bcryptjs_1.compare)(password, this.password);
     });
 };
 userSchema.methods.isValidPin = function (pin) {
@@ -76,12 +76,12 @@ userSchema.methods.isValidPin = function (pin) {
         const { pin: originalPin, hasPIN } = (yield User.findById(this.id).select('+pin'));
         if (!hasPIN)
             return false;
-        return yield (0, bcrypt_1.compare)(pin, originalPin);
+        return yield (0, bcryptjs_1.compare)(pin, originalPin);
     });
 };
 userSchema.methods.generateSessionID = function () {
     return __awaiter(this, void 0, void 0, function* () {
-        this.sessionId = yield (0, bcrypt_1.hash)(this.id + Date.now().toString(), yield (0, bcrypt_1.genSalt)(10));
+        this.sessionId = yield (0, bcryptjs_1.hash)(this.id + Date.now().toString(), yield (0, bcryptjs_1.genSalt)(10));
         this.save();
         return this.sessionId;
     });
