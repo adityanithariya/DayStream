@@ -1,0 +1,38 @@
+name: Build and Prepare for Vercel Deployment
+
+on:
+    push:
+        branches: [server/release]
+
+jobs:
+    build-and-clean:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v3
+
+            - name: Use Node.js 18.17.0
+              uses: actions/setup-node@v3
+              with:
+                  node-version: 18.17.0
+
+            - name: Install dependencies
+              run: yarn server:install
+
+            - name: Build project
+              run: yarn server:build
+
+            - name: Clean up compiled TypeScript files
+              run: |
+                  cd server
+                  find . -name "*.ts" -type f -delete
+            - name: Copy build artifacts to root directory
+              run: |
+                  cd server
+                  mv dist/* .
+            - name: Deploy
+              uses: s0/git-publish-subdir-action@develop
+              env:
+                  REPO: self
+                  BRANCH: server/deploy
+                  FOLDER: server
+                  GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
