@@ -4,10 +4,12 @@
     {
       "src": "app.js",
       "use": "@vercel/node",
-      "config": { "includeFiles": ["dist/**", "node_modules/**"] },
-      "functions": {
-        "controllers/*.js": { "maxDuration": 60 },
-        "middleware/**/*.js": { "maxDuration": 60 }
+      "config": {
+        "includeFiles": ["dist/**", "node_modules/**"],
+        "functions": {
+          "controllers/*.js": { "maxDuration": 60 },
+          "middleware/**/*.js": { "maxDuration": 60 }
+        }
       }
     }
   ],
