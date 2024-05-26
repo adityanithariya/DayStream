@@ -9,8 +9,8 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const mongoose_1 = require("mongoose");
 const bcryptjs_1 = require("bcryptjs");
+const mongoose_1 = require("mongoose");
 const userSchema = new mongoose_1.Schema({
     username: {
         type: String,
