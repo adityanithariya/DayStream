@@ -13,7 +13,7 @@ import type { NextPage, Viewport } from 'next'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { Suspense, useEffect, useRef } from 'react'
+import { useEffect, useRef } from 'react'
 import { FcGoogle } from 'react-icons/fc'
 import { FiEye, FiEyeOff } from 'react-icons/fi'
 import { IoIosCheckmark } from 'react-icons/io'
@@ -134,15 +134,15 @@ const AuthPage: NextPage = ({
   }, [action, searchParams, replace, post])
 
   return (
-    <div className="relative flex justify-center items-center h-screen bg-gradient-to-b from-light to-dark from-1%">
+    <div className="relative flex flex-col justify-center items-center h-screen bg-gradient-to-b from-light to-dark from-1%">
       <Image
         src={authVector}
         alt="vector"
         fill
         className="top-0 !h-fit sm:hidden"
       />
-      <div className="sm:w-[40vw] w-full flex flex-col items-center justify-center sm:h-auto">
-        <div className="max-w-md h-22 w-22 bg-[#ffffff60] rounded-2xl mb-8 flex items-center justify-center">
+      <div className="sm:w-[40vw] w-full flex flex-col h-screen items-center justify-center">
+        <div className="max-w-md h-22 w-22 bg-[#ffffff60] rounded-2xl mb-5 flex items-center justify-center">
           <Image
             className="m-6 text-xl"
             src="/icon-72x72.png"
@@ -182,9 +182,11 @@ const AuthPage: NextPage = ({
               ) : null}
             </div>
             {usernameError && (
-              <Badge className="!w-fit mt-2 !text-[#ff0000c0] !bg-[#ffffff90]">
-                Username is required
-              </Badge>
+              <>
+                <Badge className="!w-fit mt-2 !text-[#ff0000c0] !bg-[#ffffff90]">
+                  Username is required
+                </Badge>
+              </>
             )}
             {action === Action.SIGNUP ? (
               <>
@@ -238,7 +240,7 @@ const AuthPage: NextPage = ({
             )}
           </div>
           <button
-            className="p-2 py-3.5 my-5 bg-white rounded-3xl text-primary font-bold text-sm mt-8 uppercase shadow-[0px_6px_15px_0px_#ffffff7d] focus-visible:bg-slate-100 hover:bg-slate-100"
+            className="p-2 py-3.5 my-4 bg-white rounded-3xl text-primary font-bold text-sm mt-8 uppercase shadow-[0px_6px_15px_0px_#ffffff7d] focus-visible:bg-slate-100 hover:bg-slate-100"
             type="submit"
             onClick={handleAuth}
           >
@@ -249,13 +251,13 @@ const AuthPage: NextPage = ({
               href="/forgot-password"
               className={clsx(
                 buttonVariants({ variant: 'link' }),
-                'text-white !p-0 m-auto text-sm',
+                'text-white !p-0 m-auto text-sm -mt-2 mb-2',
               )}
             >
               Forgot password?
             </Link>
           ) : null}
-          <div className="mt-9 flex items-center justify-center rounded-full overflow-hidden border border-white">
+          <div className="my-4 flex items-center justify-center rounded-full overflow-hidden border border-white">
             <Link
               href="/google/auth"
               className="flex items-center justify-center bg-[#ffffff30] text-white hover:bg-[#ffffff50] p-2 py-3 w-full text-center font-semibold"
@@ -263,32 +265,33 @@ const AuthPage: NextPage = ({
               <FcGoogle className="mr-2 size-7" />
               <span className="mr-4">Google</span>
             </Link>
-            {/* <button
+            {/* <div className="bg-white w-[1px] h-full" />
+            <button
               type="button"
-              className="flex items-center justify-center bg-[#ffffff40] text-white p-2 py-3 w-full text-center font-semibold"
+              className="flex items-center justify-center bg-[#ffffff30] text-white hover:bg-[#ffffff50] p-2 py-3 w-full text-center font-semibold"
             >
               <FaGithub className="mr-2 size-7" />
               <span className="mr-4">GitHub</span>
             </button> */}
           </div>
-          <div className="text-white mb-0 text-sm mt-10 text-center">
-            {action === Action.LOGIN
-              ? "Don't have an account?"
-              : 'Already have an account?'}
-            <Link
-              href={`/auth/${
-                action === Action.LOGIN ? Action.SIGNUP : Action.LOGIN
-              }`}
-              className={clsx(
-                buttonVariants({ variant: 'link' }),
-                'font-semibold text-white px-2',
-              )}
-              type="submit"
-            >
-              {action === Action.LOGIN ? 'Sign Up now!' : 'Login now!'}
-            </Link>
-          </div>
         </form>
+        <div className="text-white text-sm text-center sm:mt-0 mt-4">
+          {action === Action.LOGIN
+            ? "Don't have an account?"
+            : 'Already have an account?'}
+          <Link
+            href={`/auth/${
+              action === Action.LOGIN ? Action.SIGNUP : Action.LOGIN
+            }`}
+            className={clsx(
+              buttonVariants({ variant: 'link' }),
+              'font-semibold text-white px-2',
+            )}
+            type="submit"
+          >
+            {action === Action.LOGIN ? 'Sign Up now!' : 'Login now!'}
+          </Link>
+        </div>
       </div>
     </div>
   )
