@@ -31,8 +31,9 @@ const useAPI = () => {
       if (status === 401) {
         if (data?.code === 'pin-auth-failed') {
           if (!pathname.startsWith('/pin')) replace(`/pin?next=${pathname}`)
-        } else if (!pathname.startsWith('/auth'))
+        } else if (!pathname.startsWith('/auth')) {
           replace(`/auth/login?next=${pathname}`)
+        }
         return Promise.reject(error)
       }
       toastError(data?.message || 'An error occurred. Please try again.')

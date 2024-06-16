@@ -3,6 +3,50 @@
 @tailwind utilities;
 
 input::selection {
-    color: #03B5FB;
-    background-color: white;
+	color: #03b5fb;
+	background-color: white;
+}
+
+@property --from {
+	syntax: "<angle>";
+	initial-value: 0deg;
+	inherits: true;
+}
+
+@property --color {
+	syntax: "<color>";
+	initial-value: red;
+	inherits: false;
+}
+
+.conic-animate {
+	--from-color: #feaa29;
+	--to-color: #19ecf0;
+	--from: 0deg;
+	background: conic-gradient(from var(--from), var(--color), transparent);
+	animation: rotate 2s linear infinite;
+	transition: all 1s;
+}
+
+@keyframes rotate {
+	0% {
+		--from: 0deg;
+		--color: var(--from-color);
+	}
+	25% {
+		--from: 90deg;
+		--color: var(--to-color);
+	}
+	50% {
+		--from: 180deg;
+		--color: var(--to-color);
+	}
+	75% {
+		--from: 270deg;
+		--color: var(--from-color);
+	}
+	100% {
+		--from: 360deg;
+		--color: var(--from-color);
+	}
 }
