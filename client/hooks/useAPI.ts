@@ -18,9 +18,9 @@ const useAPI = () => {
   API.interceptors.request.use(
     (config: InternalAxiosRequestConfig): InternalAxiosRequestConfig => {
       const token = localStorage.getItem('token')
-      const authenticatedPIN = sessionStorage.getItem('pin-auth')
+      const pin = sessionStorage.getItem('pin-auth')
       if (token) config.headers.token = token
-      if (authenticatedPIN) config.headers.pinAuth = authenticatedPIN
+      if (pin) config.headers.pinAuth = pin
       return config
     },
   )
@@ -29,6 +29,7 @@ const useAPI = () => {
     (error: any) => {
       const { status, data } = error.response
       if (status === 401) {
+        if (process.env.NODE_ENV === 'development') return Promise.resolve()
         if (data?.code === 'pin-auth-failed') {
           if (!pathname.startsWith('/pin')) replace(`/pin?next=${pathname}`)
         } else if (!pathname.startsWith('/auth')) {

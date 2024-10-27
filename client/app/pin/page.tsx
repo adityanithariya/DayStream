@@ -12,16 +12,11 @@ import { AES } from 'crypto-js'
 import { REGEXP_ONLY_DIGITS } from 'input-otp'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import React, {
-  type ReactElement,
-  useState,
-  useRef,
-  useEffect,
-  useCallback,
-} from 'react'
+import React, { type ReactElement, useState, useRef, useCallback } from 'react'
 import { FaShield } from 'react-icons/fa6'
 import { IoIosArrowRoundBack } from 'react-icons/io'
 
+import CheckAuth from '@components/CheckAuth'
 import type { CommonProps } from '@type/common'
 import type { NextPage } from 'next'
 
@@ -60,11 +55,6 @@ const PINButton = ({
   )
 }
 
-type VerifyPINType = {
-  valid: boolean
-  sessionId: string
-}
-
 const PINLogin: NextPage = ({ searchParams }: CommonProps) => {
   const [pin, setPin] = useState<string>('')
   const [isValid, setIsValid] = useState(true)
@@ -86,21 +76,20 @@ const PINLogin: NextPage = ({ searchParams }: CommonProps) => {
 
   const box = useRef<HTMLElement>(null)
   const { replace } = useRouter()
-  const { post } = useAPI()
+  const api = useAPI()
   const next = searchParams?.next
 
   const verifyPin = useCallback(async () => {
     try {
       const {
-        data: { valid, sessionId },
-      } = await post<VerifyPINType>('/u/pin/verify', { pin })
+        data: { id },
+      } = await api.post<{ id: string }>('/u/pin/session')
+      sessionStorage.setItem('pin-auth', AES.encrypt(pin, id).toString())
+      const { status } = await api.get('/auth/protect')
+      const valid = status !== 401
       setIsValid(valid)
 
       if (valid) {
-        sessionStorage.setItem(
-          'pin-auth',
-          AES.encrypt(pin, sessionId).toString(),
-        )
         setTimeout(() => {
           replace(next || '/')
         }, 500)
@@ -108,15 +97,16 @@ const PINLogin: NextPage = ({ searchParams }: CommonProps) => {
       }
     } catch (err: any) {
       console.log(err)
-      if (err?.response?.status === 401) replace('/login')
+      if (err?.response?.status === 401) replace('/auth/login')
     }
-  }, [pin, post, replace, next])
+  }, [pin, api, replace, next])
 
   return (
     <main
       ref={box}
       className="h-screen flex flex-col items-center sm:h-[50vh] sm:w-[50vw] lg:w-[35vw] sm:justify-center sm:mt-[20vh] sm:mx-auto sm:border sm:rounded-2xl"
     >
+      <CheckAuth />
       <div className="relative w-[100vw] py-10 flex justify-center">
         <FaShield className="size-7 text-primary" />
         <Link

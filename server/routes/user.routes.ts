@@ -16,18 +16,8 @@ userRouter.post(
   },
 )
 
-userRouter.post(
-  '/pin/verify',
-  validateHasParameters('pin'),
-  async (req: Request, res: Response) => {
-    const user = req.user as IUser
-    const isValid = await user.isValidPin(req.body.pin)
-    if (!isValid) res.status(200).json({ valid: false })
-    else
-      res
-        .status(200)
-        .json({ valid: true, sessionId: await user.generateSessionID() })
-  },
+userRouter.post('/pin/session', async (req: Request, res: Response) =>
+  res.send({ id: await req.user?.generateSessionID() }),
 )
 
 export default userRouter

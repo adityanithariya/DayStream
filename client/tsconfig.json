@@ -19,7 +19,11 @@
     ],
     "paths": {
       "@assets/*": ["./assets/*"],
-      "@components/*": ["./components/*"],
+      "@components/*": [
+        "./components/*",
+        "./components/ui/*",
+        "./components/providers/*"
+      ],
       "@lib/*": ["./lib/*"],
       "@public/*": ["./public/*"],
       "@store/*": ["./store/*"],

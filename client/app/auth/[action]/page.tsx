@@ -1,6 +1,7 @@
 'use client'
 
 import authVector from '@assets/auth-vector.svg'
+import CheckAuth from '@components/CheckAuth'
 import { Badge } from '@components/ui/badge'
 import { buttonVariants } from '@components/ui/button'
 import useAPI from '@hooks/useAPI'
@@ -99,9 +100,7 @@ const AuthPage: NextPage = ({
           localStorage.setItem('token', res?.data?.token)
           replace(next || '/')
         })
-        .catch((err) => {
-          toastError(err.response.data.message)
-        })
+        .catch()
     } else if (action === Action.SIGNUP) {
       post('/auth/signup', { username, email, password })
         .then((res) => {
@@ -109,9 +108,7 @@ const AuthPage: NextPage = ({
           localStorage.setItem('token', res?.data?.token)
           replace(next || '/')
         })
-        .catch((err) => {
-          toastError(err.response.data.message)
-        })
+        .catch()
     }
   }
 
@@ -135,6 +132,7 @@ const AuthPage: NextPage = ({
 
   return (
     <div className="relative flex flex-col justify-center items-center h-screen bg-gradient-to-b from-light to-dark from-1%">
+      <CheckAuth />
       <Image
         src={authVector}
         alt="vector"
