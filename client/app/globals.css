@@ -2,6 +2,15 @@
 @tailwind components;
 @tailwind utilities;
 
+input {
+	background-color: transparent;
+	outline: none;
+}
+
+input[type="datetime-local"] {
+	color-scheme: dark;
+}
+
 input::selection {
 	color: #03b5fb;
 	background-color: white;
@@ -49,4 +58,54 @@ input::selection {
 		--from: 360deg;
 		--color: var(--from-color);
 	}
+}
+
+.inputWrapper input:focus + div,
+.inputWrapper input:not(:placeholder-shown) + div {
+	@apply text-[10px] top-[10%] md:top-[8%] translate-y-0 text-[#ffffffa0];
+}
+
+.inputWrapper input + div {
+	@apply text-base top-[50%] translate-y-[-50%];
+}
+
+.scale-down {
+	scale: 80%;
+}
+
+.scale-down-2 {
+	scale: 96%;
+}
+
+button {
+	user-select: none;
+}
+
+@keyframes spin {
+	0% {
+		rotate: 0deg;
+	}
+	20% {
+		rotate: 60deg;
+	}
+	40% {
+		rotate: 180deg;
+	}
+	60% {
+		rotate: 240deg;
+	}
+	80% {
+		rotate: 300deg;
+	}
+	100% {
+		rotate: 360deg;
+	}
+}
+
+.loader {
+	border-radius: 50%;
+	border-top: 3px solid white;
+	width: 20px;
+	height: 20px;
+	animation: spin 1s linear infinite forwards;
 }

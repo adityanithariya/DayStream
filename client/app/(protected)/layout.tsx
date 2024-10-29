@@ -1,5 +1,6 @@
 import ProtectedGroup from '@components/layout/protect'
 import React, { type ReactNode } from 'react'
+import Navbar from '@components/layout/navbar'
 
 const BaseLayout = ({
   children,
@@ -8,11 +9,9 @@ const BaseLayout = ({
 }>) => {
   return (
     <ProtectedGroup>
-      <main className="h-[100vh]">
-        <div className="h-[90vh]">{children}</div>
-        <nav className="h-[10vh] flex gap-2">
-          <div>Home</div>
-        </nav>
+      <main className="bg-[#111315] min-h-[91vh] md:min-h-[100vh] text-white mb-[calc(9vh-1px)] md:mb-0">
+        <div>{children}</div>
+        <Navbar />
       </main>
     </ProtectedGroup>
   )
