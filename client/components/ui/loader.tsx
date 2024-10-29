@@ -21,6 +21,7 @@ const Loader: FC<CustomButtonProps> = ScaleWrapper(
       </button>
     )
   },
+  'Loader',
   'scale-down-2',
 )
 

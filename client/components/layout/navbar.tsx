@@ -1,21 +1,21 @@
 'use client'
 
-import React, { type CSSProperties, type FC } from 'react'
+import wave from '@assets/wave.svg'
+import clsx from 'clsx'
 import Image from 'next/image'
+import Link from 'next/link'
+import { usePathname } from 'next/navigation'
+import React, { type CSSProperties, type FC } from 'react'
+import { FiPlus } from 'react-icons/fi'
 import { GoHome, GoHomeFill, GoPlus } from 'react-icons/go'
+import { HiOutlineUser, HiUser } from 'react-icons/hi2'
 import {
   IoCalendarClear,
   IoCalendarClearOutline,
   IoSettings,
   IoSettingsOutline,
 } from 'react-icons/io5'
-import { HiOutlineUser, HiUser } from 'react-icons/hi2'
-import wave from '@assets/wave.svg'
-import clsx from 'clsx'
 import type { IconType } from 'react-icons/lib'
-import { FiPlus } from 'react-icons/fi'
-import { usePathname, useRouter } from 'next/navigation'
-import Link from 'next/link'
 
 const NavItem: FC<{
   selectedTab: string

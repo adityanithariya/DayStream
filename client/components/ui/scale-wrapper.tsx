@@ -4,9 +4,10 @@ import React, { type FC, type HTMLAttributes } from 'react'
 
 const ScaleWrapper = <T extends HTMLAttributes<HTMLButtonElement>>(
   Button: FC<T>,
+  displayName = 'ScaleButton',
   className = 'scale-down',
 ): FC<T> => {
-  return (props: T) => (
+  const ChildComponent = (props: T) => (
     <Button
       {...props}
       onMouseDown={(e) => e.currentTarget.classList.add(className)}
@@ -17,6 +18,10 @@ const ScaleWrapper = <T extends HTMLAttributes<HTMLButtonElement>>(
       {props.children}
     </Button>
   )
+  ChildComponent.displayName = displayName
+  return ChildComponent
 }
+
+ScaleWrapper.displayName = 'ScaleWrapper'
 
 export default ScaleWrapper

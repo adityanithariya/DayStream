@@ -1,6 +1,6 @@
+import Navbar from '@components/layout/navbar'
 import ProtectedGroup from '@components/layout/protect'
 import React, { type ReactNode } from 'react'
-import Navbar from '@components/layout/navbar'
 
 const BaseLayout = ({
   children,
