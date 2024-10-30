@@ -18,6 +18,7 @@ export interface IUser extends Document {
   isValidPassword(password: string): Promise<boolean>
   isValidPin(pin: string): Promise<boolean>
   generateSessionID(): Promise<void>
+  clearSession(): void
 }
 
 const userSchema = new Schema<IUser>(
@@ -102,6 +103,11 @@ userSchema.methods.generateSessionID = async function (this: IUser) {
   )
   this.save()
   return this.sessionId
+}
+
+userSchema.methods.clearSession = async function (this: IUser) {
+  this.sessionId = ''
+  this.save()
 }
 
 userSchema.virtual('hasPassword').get(function (this: IUser) {

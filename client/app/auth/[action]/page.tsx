@@ -122,13 +122,10 @@ const AuthPage: NextPage = ({
         toastError('GitHub authentication failed. Please try again.')
       return replace('/auth/login')
     }
-    const token = searchParams?.token
-    const next = searchParams?.next
-    post(`/auth/${action}/success`, { token }).then((res) => {
-      toastSuccess(res?.data?.message)
-      if (res?.data?.success) replace(next || '/')
-    })
-  }, [action, searchParams, replace, post])
+    localStorage.setItem('token', searchParams?.token as string)
+    toastSuccess('Welcome back!')
+    replace(`/auth/login?next=${searchParams?.next}`)
+  }, [action, searchParams, replace])
 
   return (
     <div className="relative flex flex-col justify-center items-center h-screen bg-gradient-to-b from-light to-dark from-1%">

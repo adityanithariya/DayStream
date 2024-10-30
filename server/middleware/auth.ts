@@ -1,5 +1,5 @@
 import User, { type IUser } from '@model/User.model'
-import CryptoJS from 'crypto-js'
+import { AES, enc } from 'crypto-js'
 import type {
   Express as ExpressApp,
   NextFunction,
@@ -119,17 +119,15 @@ export const pinAuth = async (
       .status(401)
       .json({ error: 'PIN Unauthenticated', code: 'pin-auth-failed' })
   const user = await User.findById(req?.user?.id).select('+sessionId')
-  const pin = CryptoJS.AES.decrypt(pinAuth, user?.sessionId as string).toString(
-    CryptoJS.enc.Utf8,
-  )
+  if (!user?.hasPIN) return next()
 
-  if (user?.isValidPin(pin)) next()
-  else {
-    res.statusMessage = 'pin-auth-failed'
-    return res
-      .status(401)
-      .json({ error: 'PIN Unauthenticated', code: 'pin-auth-failed' })
-  }
+  const pin = AES.decrypt(pinAuth, user?.sessionId as string).toString(enc.Utf8)
+  if (await user?.isValidPin(pin)) return next()
+
+  res.statusMessage = 'pin-auth-failed'
+  return res
+    .status(401)
+    .json({ error: 'PIN Unauthenticated', code: 'pin-auth-failed' })
 }
 
 export default initPassport

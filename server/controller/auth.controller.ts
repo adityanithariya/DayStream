@@ -46,8 +46,9 @@ export const signIn = async (req: Request, res: Response) => {
   )(req, res)
 }
 
-export const signOut = async (_req: Request, res: Response) => {
-  res.clearCookie('token').status(200).json({ message: 'User signed out' })
+export const signOut = async (req: Request, res: Response) => {
+  req.user?.clearSession()
+  res.status(200).json({ message: 'User signed out' })
 }
 
 export const checkAuth = async (req: Request, res: Response) => {

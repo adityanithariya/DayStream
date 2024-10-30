@@ -1,43 +1,75 @@
-import { Schema, model } from 'mongoose'
+import { type Document, Schema, type Types, model } from 'mongoose'
 
-interface TaskType {
+export enum Days {
+  SUN = 'Sun',
+  MON = 'Mon',
+  TUE = 'Tue',
+  WED = 'Wed',
+  THU = 'Thu',
+  FRI = 'Fri',
+  SAT = 'Sat',
+}
+
+export enum Repeat {
+  ONCE = 'once',
+  EVERYDAY = 'everyday',
+  CUSTOM = 'custom',
+}
+
+export interface TaskDocument extends Document {
   title: string
-  daily: boolean
-  startDate: Date
-  endDate: Date
+  user: Types.ObjectId
+  repeat: Repeat
+  customDays?: Days[]
+  startDate?: Date
+  endDate?: Date
   completed: Date[]
   createdAt: Date
   updatedAt: Date
 }
 
-const taskSchema = new Schema<TaskType>(
-  {
-    title: {
-      type: String,
-      required: true,
-      trim: true,
-    },
-    daily: {
-      type: Boolean,
-      required: true,
-      default: false,
-    },
-    startDate: {
-      type: Date,
-    },
-    endDate: {
-      type: Date,
-    },
-    completed: [
-      {
-        type: Date,
-        default: false,
-      },
-    ],
+const taskSchema = new Schema<TaskDocument>({
+  title: {
+    type: String,
+    required: true,
   },
-  { timestamps: true },
-)
+  user: {
+    type: Schema.Types.ObjectId,
+    ref: 'User',
+    required: true,
+    select: false,
+  },
+  repeat: {
+    type: String,
+    enum: Object.values(Repeat),
+    default: Repeat.ONCE,
+  },
+  customDays: {
+    type: [String],
+    enum: Object.values(Days),
+  },
+  startDate: {
+    type: Date,
+  },
+  endDate: {
+    type: Date,
+  },
+  completed: {
+    type: [Date],
+    default: [],
+  },
+  createdAt: {
+    type: Date,
+    default: Date.now,
+  },
+  updatedAt: {
+    type: Date,
+    default: Date.now,
+  },
+})
 
-const Task = model<TaskType>('Task', taskSchema)
+taskSchema.index({ title: 1, repeat: 1, startDate: 1, endDate: 1 })
+
+const Task = model<TaskDocument>('Task', taskSchema)
 
 export default Task

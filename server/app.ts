@@ -6,6 +6,7 @@ import { checkAuth } from '@controller/auth.controller'
 import initPassport, { pinAuth } from '@middleware/auth'
 import '@middleware/config'
 import authRouter from '@routes/auth.routes'
+import taskRouter from '@routes/task.routes'
 import userRouter from '@routes/user.routes'
 import cookieParser from 'cookie-parser'
 import cors from 'cors'
@@ -37,8 +38,11 @@ app.get('/health', (_req: Request, res: Response) => {
 
 app.use(passport.authenticate('jwt', { session: false }))
 app.use('/u', userRouter)
+
 app.use(pinAuth)
 app.get('/auth/protect', checkAuth)
+
+app.use('/task', taskRouter)
 
 console.log('Connecting to MongoDB...')
 app.listen(port, async () => {

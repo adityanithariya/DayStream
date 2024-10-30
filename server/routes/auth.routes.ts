@@ -35,11 +35,6 @@ authRouter.get(
   },
 )
 
-authRouter.post('/google/success', (req: Request, res: Response) => {
-  res.cookie('token', req.body.token)
-  res.status(200).json({ message: 'Google Sign-In Success', success: true })
-})
-
 // Utility
 authRouter.get(
   '/username',

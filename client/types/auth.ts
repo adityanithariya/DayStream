@@ -1,3 +1,11 @@
+export interface IUser {
+  _id: string
+  username: string
+  email: `${string}@${string}`
+  createdAt: Date
+  updatedAt: Date
+}
+
 export enum Action {
   LOGIN = 'login',
   SIGNUP = 'signup',

@@ -2,24 +2,19 @@
 
 import Loader from '@components/ui/loader'
 import ScaleButton from '@components/ui/scale-button'
+import useAPI from '@hooks/useAPI'
+import { getDateString } from '@lib/now'
+import { toastError, toastSuccess } from '@lib/toast'
+import type { Days, ITask, MarkDays } from '@type/task'
+import { Repeat } from '@type/task'
 import clsx from 'clsx'
 import React, { useState, type FC } from 'react'
 
-interface Days {
-  Sun: boolean
-  Mon: boolean
-  Tue: boolean
-  Wed: boolean
-  Thu: boolean
-  Fri: boolean
-  Sat: boolean
-}
-
 const FrequencyButtons: FC<{
   title: string
-  id: string
+  id: Repeat
   freq: string
-  setFreq: (freq: string) => void
+  setFreq: (freq: Repeat) => void
 }> = ({ title, id, freq, setFreq }) => {
   return (
     <ScaleButton
@@ -40,9 +35,9 @@ const CustomFreqButton = ({
   selectedDays,
   selectDay,
 }: {
-  day: keyof Days
-  selectedDays: Days
-  selectDay: (days: keyof Days) => void
+  day: Days
+  selectedDays: MarkDays
+  selectDay: (days: Days) => void
 }) => {
   return (
     <ScaleButton
@@ -63,8 +58,15 @@ const CustomFreqButton = ({
 }
 
 const AddTask = () => {
-  const [freq, setFreq] = useState<string>('once')
-  const [selectedDays, setSelectedDays] = useState<Days>({
+  const [data, setData] = useState<ITask>({
+    title: '',
+    repeat: Repeat.ONCE,
+    startDate: new Date(),
+    endDate: new Date(Date.now() + 3600000),
+  })
+  const freq = data.repeat
+  const setFreq = (freq: Repeat) => setData({ ...data, repeat: freq })
+  const [selectedDays, setSelectedDays] = useState<MarkDays>({
     Sun: true,
     Mon: true,
     Tue: true,
@@ -74,31 +76,67 @@ const AddTask = () => {
     Sat: true,
   })
   const [loading, setLoading] = useState<boolean>(false)
-  const toggleDay = (day: keyof Days) =>
+  const toggleDay = (day: Days) =>
     setSelectedDays({ ...selectedDays, [day]: !selectedDays[day] })
+
+  const { post } = useAPI()
+  const createTask = async () => {
+    setLoading(true)
+    const task = Object.fromEntries(
+      Object.entries(data).filter(([_, v]) => v != null),
+    )
+    const repeat =
+      task.repeat === Repeat.CUSTOM
+        ? Object.values(selectedDays).find((i) => i) // got a selected day
+          ? Object.values(selectedDays).find((i) => !i) // got a day not selected
+            ? Repeat.CUSTOM
+            : Repeat.EVERYDAY
+          : Repeat.ONCE
+        : task.repeat
+    try {
+      const { status, data } = await post('/task/create', {
+        ...task,
+        repeat,
+        customDays:
+          repeat === Repeat.CUSTOM ? Object.keys(selectedDays) : undefined,
+      })
+      if (status === 200) toastSuccess('Task created successfully!')
+      else toastError(data?.error || 'Failed to create task')
+    } catch (err) {
+      console.error(err)
+    } finally {
+      setLoading(false)
+    }
+  }
   return (
     <div className="px-5">
       <h2 className="py-6 text-xl">Add Task</h2>
       <label className="inputWrapper bg-[#25272d] rounded-xl block relative px-5 py-2 pt-6 mb-5">
-        <input type="text" placeholder=" " className="w-full" />
+        <input
+          type="text"
+          placeholder=" "
+          className="w-full"
+          value={data.title}
+          onChange={(e) => setData({ ...data, title: e.target.value })}
+        />
         <div className="absolute transition-all">Title</div>
       </label>
       <div className="flex items-center justify-around mb-5">
         <FrequencyButtons
           title="Once"
-          id="once"
+          id={Repeat.ONCE}
           freq={freq}
           setFreq={setFreq}
         />
         <FrequencyButtons
           title="Everyday"
-          id="everyday"
+          id={Repeat.EVERYDAY}
           freq={freq}
           setFreq={setFreq}
         />
         <FrequencyButtons
           title="Custom"
-          id="custom"
+          id={Repeat.CUSTOM}
           freq={freq}
           setFreq={setFreq}
         />
@@ -110,7 +148,7 @@ const AddTask = () => {
             {Object.values(selectedDays).includes(true)
               ? Object.values(selectedDays).includes(false)
                 ? Object.keys(selectedDays)
-                    .filter((day) => selectedDays[day as keyof Days])
+                    .filter((day) => selectedDays[day as keyof MarkDays])
                     .join(', ')
                 : 'Everyday'
               : 'Once'}
@@ -119,7 +157,7 @@ const AddTask = () => {
             {Object.keys(selectedDays).map((day) => (
               <CustomFreqButton
                 key={day}
-                day={day as keyof Days}
+                day={day as keyof MarkDays}
                 selectedDays={selectedDays}
                 selectDay={toggleDay}
               />
@@ -132,9 +170,10 @@ const AddTask = () => {
           type="datetime-local"
           placeholder=" "
           className="w-full -ml-1 md:ml-0"
-          defaultValue={new Date(new Date().getTime() + 5.5 * 3600000)
-            .toISOString()
-            .slice(0, 16)}
+          value={getDateString(data.startDate)}
+          onChange={(e) =>
+            setData({ ...data, startDate: new Date(e.target.value) })
+          }
         />
         <div className="absolute transition-all">Start Date</div>
       </label>
@@ -143,18 +182,20 @@ const AddTask = () => {
           type="datetime-local"
           placeholder=" "
           className="w-full -ml-1 md:ml-0"
-          defaultValue={new Date(new Date().getTime() + 6.5 * 3600000)
-            .toISOString()
-            .slice(0, 16)}
+          value={getDateString(data.endDate)}
+          onChange={(e) =>
+            setData({ ...data, endDate: new Date(e.target.value) })
+          }
         />
         <div className="absolute transition-all">End Date</div>
       </label>
       <Loader
-        onClick={() => setLoading(true)}
+        onClick={createTask}
+        disabled={loading}
         className={clsx(
           'border-[#00000001] border w-full py-3 rounded-xl transition-all hover:border hover:border-[#03b5fb]',
           loading
-            ? 'bg-[#03b5fb] text-black w-10 h-10'
+            ? 'bg-[#03b5fb] text-black !w-10 h-10'
             : 'bg-[#25272d] text-[#03b5fb]',
         )}
         loading={loading}
