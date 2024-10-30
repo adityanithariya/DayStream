@@ -87,18 +87,21 @@ const AddTask = () => {
     )
     const repeat =
       task.repeat === Repeat.CUSTOM
-        ? Object.values(selectedDays).find((i) => i) // got a selected day
-          ? Object.values(selectedDays).find((i) => !i) // got a day not selected
+        ? Object.values(selectedDays).includes(true) // got a selected day
+          ? Object.values(selectedDays).includes(false) // got a day not selected
             ? Repeat.CUSTOM
             : Repeat.EVERYDAY
           : Repeat.ONCE
         : task.repeat
+
     try {
       const { status, data } = await post('/task/create', {
         ...task,
         repeat,
         customDays:
-          repeat === Repeat.CUSTOM ? Object.keys(selectedDays) : undefined,
+          repeat === Repeat.CUSTOM
+            ? Object.keys(selectedDays).filter((i) => selectedDays[i as Days])
+            : undefined,
       })
       if (status === 200) toastSuccess('Task created successfully!')
       else toastError(data?.error || 'Failed to create task')
