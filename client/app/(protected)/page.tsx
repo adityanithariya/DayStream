@@ -8,12 +8,14 @@ import {
   DrawerTitle,
   DrawerTrigger,
 } from '@components/drawer'
+import InstallButton from '@components/install-button'
 import type { NextPage } from 'next'
 import React from 'react'
 
 const Home: NextPage = () => {
   return (
     <main>
+      <InstallButton />
       <Drawer>
         <DrawerTrigger>Open</DrawerTrigger>
         <DrawerContent>
