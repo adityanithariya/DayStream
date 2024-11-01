@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from 'react'
 import { FiDownload } from 'react-icons/fi'
-import useSWR from 'swr'
 
 type WindowEvent = Event & {
   prompt: () => void
@@ -13,16 +12,12 @@ function InstallButton() {
   const [deferredPrompt, setDeferredPrompt] = useState<WindowEvent | null>(null)
   const [showButton, setShowButton] = useState(false)
 
-  const { data } = useSWR('beforeinstallprompt', () => {
-    return new Promise((resolve) => {
-      window.addEventListener('beforeinstallprompt', (event) => {
-        event.preventDefault()
-        setDeferredPrompt(event as WindowEvent)
-        resolve(null)
-      })
+  useEffect(() => {
+    window.addEventListener('beforeinstallprompt', (event) => {
+      event.preventDefault()
+      setDeferredPrompt(event as WindowEvent)
     })
-  })
-  console.log(data)
+  }, [])
 
   const handleInstall = () => {
     if (deferredPrompt) {
@@ -39,9 +34,8 @@ function InstallButton() {
   }
 
   useEffect(() => {
-    if (!window.matchMedia('(display-mode: standalone)').matches) {
+    if (!window.matchMedia('(display-mode: standalone)').matches)
       setShowButton(true)
-    }
   }, [])
 
   return showButton ? (

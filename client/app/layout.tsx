@@ -57,6 +57,7 @@ export default function RootLayout({
   return (
     <html lang="en" dir="ltr">
       <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon" />
+      <link rel="manifest" href="manifest.json" />
       <body className={nunito.className} suppressHydrationWarning>
         <ToastProvider>{children}</ToastProvider>
       </body>
