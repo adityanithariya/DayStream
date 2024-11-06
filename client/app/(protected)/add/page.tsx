@@ -1,30 +1,33 @@
 'use client'
 
+import { Calendar } from '@components/ui/calendar'
 import Loader from '@components/ui/loader'
+import { MonthDayPicker } from '@components/ui/month-day-picker'
 import ScaleButton from '@components/ui/scale-button'
 import useAPI from '@hooks/useAPI'
 import { getDateString } from '@lib/now'
 import { toastError, toastSuccess } from '@lib/toast'
 import useAddTaskStore from '@store/useAddTaskStore'
-import { Days, type ITask } from '@type/task'
-import { Repeat } from '@type/task'
+import { Days, type ITask, Repeat } from '@type/task'
 import clsx from 'clsx'
+import { isSameDay } from 'date-fns'
 import React, { useState, type FC } from 'react'
+import type { DayMouseEventHandler } from 'react-day-picker'
 
 const FrequencyButtons: FC<{
   title: string
   id: Repeat
-  repeat: string
+  repeat?: Repeat
   setRepeat: (freq: Repeat) => void
 }> = ({ title, id, repeat, setRepeat }) => {
   return (
     <ScaleButton
       type="button"
       className={clsx(
-        'flex items-center justify-start px-6 py-1.5 rounded-full transition-all',
+        'flex items-center justify-start px-4 py-1.5 rounded-full transition-all text-sm',
         repeat === id ? 'bg-[#03b5fb]' : 'bg-[#25272d]',
       )}
-      onClick={() => setRepeat(id)}
+      onClick={() => (repeat === id ? setRepeat(Repeat.ONCE) : setRepeat(id))}
     >
       {title}
     </ScaleButton>
@@ -61,41 +64,72 @@ const CustomFreqButton = ({
 const AddTask = () => {
   const {
     title,
-    shadowRepeat,
-    repeat,
     startDate,
-    endDate,
-    customDays,
+    repetition: {
+      type: repetitionType,
+      daysOfWeek,
+      daysOfMonth,
+      customDates,
+      endsAt: endDate,
+    },
     setTitle,
-    setRepeat,
-    toggleDay,
+    setRepetition,
     setStartDate,
     setEndDate,
+    toggleDaysOfWeek,
+    toggleDaysOfMonth,
+    setCustomDates,
   } = useAddTaskStore()
+  const setRepeat = (type: any) => setRepetition({ type })
   const [loading, setLoading] = useState<boolean>(false)
+
+  const handleCustomDateToggle: DayMouseEventHandler = (day, modifiers) => {
+    const newCustomDates = [...(customDates || [])]
+    if (modifiers.selected) {
+      const index = customDates?.findIndex((d) => isSameDay(day, d)) || 0
+      newCustomDates.splice(index, 1)
+    } else {
+      newCustomDates.push(day)
+    }
+    setCustomDates(newCustomDates)
+  }
+  const handleMonthlyDates: DayMouseEventHandler = (day) =>
+    toggleDaysOfMonth(day.getDate())
 
   const { post } = useAPI()
   const createTask = async () => {
     setLoading(true)
     const task: ITask = {
       title,
-      repeat,
+      startDate,
+      repetition: {
+        type: repetitionType,
+      },
+      active: true,
     }
-    if (repeat === Repeat.ONCE) {
-      task.startDate = startDate
-      task.endDate = endDate
+    if (repetitionType !== Repeat.ONCE) {
+      if (repetitionType === Repeat.WEEKLY && daysOfWeek?.length)
+        task.repetition.daysOfWeek = daysOfWeek.map((day) =>
+          Object.values(Days).findIndex((d) => d === day),
+        )
+      else if (repetitionType === Repeat.MONTHLY && daysOfMonth?.length)
+        task.repetition.daysOfMonth = daysOfMonth
+      else if (repetitionType === Repeat.CUSTOM && customDates?.length) {
+        task.startDate = customDates[0]
+        task.repetition.customDates = customDates
+      } else task.repetition.type = Repeat.ONCE
+      if (task.repetition.type !== Repeat.ONCE) task.repetition.endsAt = endDate
     }
-    if (repeat === Repeat.CUSTOM) task.customDays = customDays
-
     try {
-      const { status, data } = await post('/task/create', {
-        ...task,
-        repeat,
-      })
-      if (status === 200) toastSuccess('Task created successfully!')
-      else toastError(data?.error || 'Failed to create task')
-    } catch (err) {
-      console.error(err)
+      const { status, data } = await post('/task/create', task)
+      console.log(data, status)
+      toastSuccess('Task created successfully!')
+    } catch (err: any) {
+      toastError(
+        err.response?.data?.error
+          ? `${err.response?.data?.error}: ${err.response?.data?.details?.[0]?.path}`
+          : 'Failed to create task',
+      )
     } finally {
       setLoading(false)
     }
@@ -113,73 +147,107 @@ const AddTask = () => {
         />
         <div className="absolute transition-all">Title</div>
       </label>
-      <div className="flex items-center justify-around mb-5">
+      <div className="flex items-center justify-around mb-5 max-w-[100vw]">
         <FrequencyButtons
-          title="Once"
-          id={Repeat.ONCE}
-          repeat={shadowRepeat}
+          title="Daily"
+          id={Repeat.DAILY}
+          repeat={repetitionType}
           setRepeat={setRepeat}
         />
         <FrequencyButtons
-          title="Everyday"
-          id={Repeat.EVERYDAY}
-          repeat={shadowRepeat}
+          title="Weekly"
+          id={Repeat.WEEKLY}
+          repeat={repetitionType}
+          setRepeat={setRepeat}
+        />
+        <FrequencyButtons
+          title="Monthly"
+          id={Repeat.MONTHLY}
+          repeat={repetitionType}
           setRepeat={setRepeat}
         />
         <FrequencyButtons
           title="Custom"
           id={Repeat.CUSTOM}
-          repeat={shadowRepeat}
+          repeat={repetitionType}
           setRepeat={setRepeat}
         />
       </div>
-      {shadowRepeat === 'custom' && (
-        <div className="bg-[#191a1e] rounded-2xl px-4 py-3 mb-5">
+      {repetitionType === Repeat.WEEKLY && (
+        <div className="bg-primary rounded-2xl px-4 py-3 mb-5">
           <h3>Repeat</h3>
           <div className="text-sm text-[#03b5fb]">
-            {repeat === Repeat.CUSTOM
-              ? Object.keys(Days)
-                  .filter((day) => customDays?.includes(day as Days))
-                  .join(', ')
-              : repeat === Repeat.EVERYDAY
+            {daysOfWeek?.length
+              ? daysOfWeek?.length === 7
                 ? 'Everyday'
-                : 'Once'}
+                : Object.keys(Days)
+                    .filter((day) => daysOfWeek?.includes(day as Days))
+                    .join(', ')
+              : 'Once'}
           </div>
           <div className="flex justify-between items-center">
             {Object.keys(Days).map((day) => (
               <CustomFreqButton
                 key={day}
                 day={day as Days}
-                selectedDays={customDays || []}
-                selectDay={toggleDay}
+                selectedDays={(daysOfWeek as Days[]) || []}
+                selectDay={toggleDaysOfWeek}
               />
             ))}
           </div>
         </div>
       )}
-      {repeat === Repeat.ONCE && (
-        <>
-          <label className="inputWrapper bg-[#25272d] rounded-xl block relative px-5 py-2 pt-6 mb-5">
-            <input
-              type="datetime-local"
-              placeholder=" "
-              className="w-full -ml-1 md:ml-0"
-              value={getDateString(startDate)}
-              onChange={(e) => setStartDate(new Date(e.target.value))}
-            />
-            <div className="absolute transition-all">Start Date</div>
-          </label>
-          <label className="inputWrapper bg-[#25272d] rounded-xl block relative px-5 py-2 pt-6 mb-5">
-            <input
-              type="datetime-local"
-              placeholder=" "
-              className="w-full -ml-1 md:ml-0"
-              value={getDateString(endDate)}
-              onChange={(e) => setEndDate(new Date(e.target.value))}
-            />
-            <div className="absolute transition-all">End Date</div>
-          </label>
-        </>
+      {repetitionType === Repeat.CUSTOM && (
+        <div className="bg-primary rounded-2xl px-4 py-3 mb-5">
+          <Calendar
+            mode="multiple"
+            selected={customDates}
+            onDayClick={handleCustomDateToggle}
+            disabled={{ before: new Date() }}
+            fromMonth={new Date()}
+          />
+        </div>
+      )}
+      {repetitionType === Repeat.MONTHLY && (
+        <div className="bg-primary rounded-2xl px-4 py-3 mb-5">
+          <h3 className="pt-2 -mb-2 flex items-center justify-center">
+            Repeat
+          </h3>
+          <MonthDayPicker
+            mode="multiple"
+            selected={daysOfMonth?.map((i) => new Date(2024, 6, i))}
+            onDayClick={handleMonthlyDates}
+            defaultMonth={new Date(2024, 6)}
+          />
+        </div>
+      )}
+      {repetitionType !== Repeat.CUSTOM && (
+        <label className="inputWrapper bg-[#25272d] rounded-xl block relative px-5 py-2 pt-6 mb-5">
+          <input
+            type="date"
+            placeholder=" "
+            className="w-full -ml-1 md:ml-0"
+            value={getDateString(startDate)}
+            onChange={(e) => setStartDate(new Date(e.target.value))}
+          />
+          <div className="absolute transition-all">
+            {repetitionType === Repeat.ONCE ? 'Scheduled' : 'Start'} Date
+          </div>
+        </label>
+      )}
+      {(repetitionType === Repeat.DAILY ||
+        repetitionType === Repeat.WEEKLY ||
+        repetitionType === Repeat.MONTHLY) && (
+        <label className="inputWrapper bg-[#25272d] rounded-xl block relative px-5 py-2 pt-6 mb-5">
+          <input
+            type="date"
+            placeholder=" "
+            className="w-full -ml-1 md:ml-0"
+            value={getDateString(endDate)}
+            onChange={(e) => setEndDate(new Date(e.target.value))}
+          />
+          <div className="absolute transition-all">End Date</div>
+        </label>
       )}
       <Loader
         onClick={createTask}

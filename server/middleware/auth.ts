@@ -51,6 +51,7 @@ const initPassport = (app: ExpressApp) => {
           return done(null, false, { message: 'Account Created using Socials' })
         const isValid = await user.isValidPassword(password)
         if (!isValid) return done(null, false, { message: 'Invalid password' })
+        await user.generateSessionID()
         return done(null, user.id, { message: 'Welcome back!' })
       },
     ),

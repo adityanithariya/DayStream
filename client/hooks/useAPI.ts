@@ -37,7 +37,7 @@ const useAPI = () => {
         }
         return Promise.reject(error)
       }
-      toastError(data?.message || 'An error occurred. Please try again.')
+      // toastError(data?.message || 'An error occurred. Please try again.')
       return Promise.reject(error)
     },
   )

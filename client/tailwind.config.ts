@@ -18,6 +18,14 @@ const config = {
       },
     },
     extend: {
+      backgroundColor: {
+        primary: '#25272d',
+        'primary-dark': '#111315',
+        secondary: '#03b5fb',
+      },
+      borderColor: {
+        secondary: '#03b5fb',
+      },
       textColor: {
         primary: '#03B5FB',
       },

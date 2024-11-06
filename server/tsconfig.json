@@ -78,7 +78,8 @@
       "@model/*": ["./model/*"],
       "@routes/*": ["./routes/*"],
       "@middleware/*": ["./middleware/*"],
-      "@utils/*": ["./utils/*"]
+      "@utils/*": ["./utils/*"],
+      "#types/*": ["./types/*"]
     },
     "baseUrl": "./"
   },

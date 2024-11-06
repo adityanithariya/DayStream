@@ -1,75 +1,175 @@
-import { type Document, Schema, type Types, model } from 'mongoose'
+import { startOfDay } from '@utils/date-fns'
+import type { Model, Types } from 'mongoose'
+import { Schema, model } from 'mongoose'
+import type {
+  Completion,
+  Repetition,
+  TaskDocument,
+  TaskModel,
+} from '#types/task'
+import { CompletionStatus, Repeat, TimeUnits } from '#types/task'
 
-export enum Days {
-  SUN = 'Sun',
-  MON = 'Mon',
-  TUE = 'Tue',
-  WED = 'Wed',
-  THU = 'Thu',
-  FRI = 'Fri',
-  SAT = 'Sat',
+const CompletionSchema = new Schema<Completion>(
+  {
+    completedAt: {
+      type: Date,
+      required: true,
+      index: true,
+    },
+    duration: {
+      type: {
+        value: Number,
+        unit: {
+          type: String,
+          enum: Object.values(TimeUnits),
+        },
+      },
+      default: {
+        value: 0,
+        unit: TimeUnits.MINUTES,
+      },
+    },
+    status: {
+      type: String,
+      enum: Object.values(CompletionStatus),
+      default: CompletionStatus.PENDING,
+    },
+    notes: String,
+  },
+  { _id: false },
+)
+
+const RepetitionSchema = new Schema<Repetition>(
+  {
+    type: {
+      type: String,
+      enum: Object.values(Repeat),
+      required: true,
+    },
+    daysOfWeek: [
+      {
+        type: Number,
+        min: 0,
+        max: 6,
+      },
+    ],
+    daysOfMonth: [
+      {
+        type: Number,
+        min: 1,
+        max: 31,
+      },
+    ],
+    customDates: [Date],
+    // End date for the repetition (optional)
+    endsAt: Date,
+    // Maximum number of occurrences (optional)
+    maxOccurrences: Number,
+  },
+  { _id: false },
+)
+
+const TaskSchema = new Schema<TaskDocument, TaskModel>(
+  {
+    title: {
+      type: String,
+      required: true,
+      trim: true,
+      index: 'text', // Enable text search on title
+    },
+    category: {
+      type: String,
+      index: true, // Index for faster category-based queries
+    },
+    startDate: {
+      type: Date,
+      required: true,
+      index: true,
+    },
+    // Repetition configuration
+    repetition: RepetitionSchema,
+    // Store completions as an array of subdocuments
+    completions: [CompletionSchema],
+    // Calculated fields for efficient querying
+    lastCompletedAt: {
+      type: Date,
+      index: true,
+    },
+    active: {
+      type: Boolean,
+      default: true,
+      index: true,
+    },
+    user: {
+      type: Schema.Types.ObjectId,
+      required: true,
+      index: true,
+      select: false,
+    },
+  },
+  {
+    timestamps: true,
+    toJSON: { virtuals: true },
+    toObject: { virtuals: true },
+  },
+)
+
+TaskSchema.index({ userId: 1, startDate: 1 })
+TaskSchema.index({ userId: 1, category: 1 })
+TaskSchema.index({ userId: 1, lastCompletedAt: 1 })
+TaskSchema.index({ 'repetition.type': 1, userId: 1 })
+
+TaskSchema.methods.isDue = function (
+  this: TaskDocument,
+  date = new Date(),
+): boolean {
+  if (!this.active) return false
+
+  const { repetition } = this
+  const today = startOfDay(date)
+
+  if (!this.active) return false
+  if (this.startDate > today) return false
+  if (this.repetition?.endsAt && today > this.repetition.endsAt) return false
+
+  switch (repetition.type) {
+    case Repeat.ONCE:
+      return startOfDay(this.startDate) <= today
+    case Repeat.DAILY:
+      return true
+    case Repeat.WEEKLY:
+      return repetition.daysOfWeek.includes(today.getDay())
+    case Repeat.MONTHLY:
+      return repetition.daysOfMonth.includes(today.getDate())
+    case Repeat.CUSTOM:
+      return repetition.customDates.some((d) => startOfDay(d) <= today)
+    default:
+      return false
+  }
 }
 
-export enum Repeat {
-  ONCE = 'once',
-  EVERYDAY = 'everyday',
-  CUSTOM = 'custom',
+TaskSchema.methods.addCompletion = function (completionData: Completion) {
+  this.completions.push(completionData)
+  this.lastCompletedAt = completionData.completedAt
+  this.completionRate = this.calculateCompletionRate()
+  return this.save()
 }
 
-export interface TaskDocument extends Document {
-  title: string
-  user: Types.ObjectId
-  repeat: Repeat
-  customDays?: Days[]
-  startDate?: Date
-  endDate?: Date
-  completed: Date[]
-  createdAt: Date
-  updatedAt: Date
+TaskSchema.statics.findDueTasks = function (
+  userId: Types.ObjectId,
+  date = new Date(),
+) {
+  return this.find({
+    userId,
+    active: true,
+    startDate: { $lte: date },
+    $or: [
+      { lastCompletedAt: { $exists: false } },
+      { lastCompletedAt: { $lt: date } },
+    ],
+  })
 }
 
-const taskSchema = new Schema<TaskDocument>({
-  title: {
-    type: String,
-    required: true,
-  },
-  user: {
-    type: Schema.Types.ObjectId,
-    ref: 'User',
-    required: true,
-    select: false,
-  },
-  repeat: {
-    type: String,
-    enum: Object.values(Repeat),
-    default: Repeat.ONCE,
-  },
-  customDays: {
-    type: [String],
-    enum: Object.values(Days),
-  },
-  startDate: {
-    type: Date,
-  },
-  endDate: {
-    type: Date,
-  },
-  completed: {
-    type: [Date],
-    default: [],
-  },
-  createdAt: {
-    type: Date,
-    default: Date.now,
-  },
-  updatedAt: {
-    type: Date,
-    default: Date.now,
-  },
-})
-
-taskSchema.index({ title: 1, repeat: 1, startDate: 1, endDate: 1 })
-
-const Task = model<TaskDocument>('Task', taskSchema)
+const Task = model<TaskDocument>('Task', TaskSchema)
 
 export default Task

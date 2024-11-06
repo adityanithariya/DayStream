@@ -1,16 +1,4 @@
-export enum Days {
-  Sun = 'Sun',
-  Mon = 'Mon',
-  Tue = 'Tue',
-  Wed = 'Wed',
-  Thu = 'Thu',
-  Fri = 'Fri',
-  Sat = 'Sat',
-}
-
-export type MarkDays = {
-  [keyof in Days]: boolean
-}
+import type { Model, Types } from 'mongoose'
 
 export enum TimeUnits {
   MINUTES = 'minutes',
@@ -43,12 +31,12 @@ export enum Repeat {
 }
 
 export interface Repetition {
-  type?: Repeat
+  type: Repeat
+  daysOfWeek: number[]
+  daysOfMonth: number[]
+  customDates: Date[]
   endsAt?: Date
   maxOccurrences?: number
-  daysOfWeek?: Array<number | Days>
-  daysOfMonth?: number[]
-  customDates?: Date[]
 }
 
 export interface ITask {
@@ -56,8 +44,25 @@ export interface ITask {
   category?: string
   startDate: Date
   repetition: Repetition
-  completions?: Completion[]
+  completions: Completion[]
   lastCompletedAt?: Date
-  completionRate?: number
+  completionRate: number
   active: boolean
+  user: Types.ObjectId
+}
+
+export interface TaskDocument extends ITask, Document {
+  addCompletion(completionData: Partial<Completion>): Promise<TaskDocument>
+  isDue(this: TaskDocument, date: Date): boolean
+}
+
+export interface TaskModel extends Model<TaskDocument> {
+  findDueTasks(userId: Types.ObjectId, date?: Date): Promise<TaskDocument[]>
+}
+
+export interface GetDueTasksQuery {
+  page?: string
+  limit?: string
+  date?: string
+  category?: string
 }

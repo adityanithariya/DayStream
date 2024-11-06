@@ -1,47 +1,69 @@
-import type { Days, ITask } from '@type/task'
+import type { Days, ITask, Repetition } from '@type/task'
 import { Repeat } from '@type/task'
+import { startOfDay } from 'date-fns'
 import { create } from 'zustand'
 
-interface AddTask {
-  shadowRepeat: Repeat
+interface TaskState extends ITask {
   setTitle: (title: string) => void
-  setRepeat: (repeat: Repeat) => void
-  setStartDate: (date: Date) => void
-  setEndDate: (date: Date) => void
-  toggleDay: (day: Days) => void
+  setCategory: (category: string) => void
+  setStartDate: (startDate: Date) => void
+  setRepetition: (repetition: Repetition) => void
+  setEndDate: (endDate: Date) => void
+  toggleDaysOfWeek: (day: Days) => void
+  toggleDaysOfMonth: (day: number) => void
+  setCustomDates: (dates: Date[]) => void
 }
 
-const useAddTaskStore = create<ITask & AddTask>((set) => ({
+const useAddTaskStore = create<TaskState>((set) => ({
   title: '',
-  shadowRepeat: Repeat.ONCE,
-  repeat: Repeat.ONCE,
-  startDate: new Date(),
-  endDate: new Date(Date.now() + 3600000),
+  startDate: startOfDay(new Date()),
+  repetition: {
+    type: Repeat.ONCE,
+    endsAt: new Date(startOfDay(new Date()).getTime() + 36_00_000 * 24 * 30),
+  },
+  active: true,
+
   setTitle: (title) => set({ title }),
-  setRepeat: (repeat) =>
+  setCategory: (category) => set({ category }),
+  setStartDate: (startDate) => set({ startDate }),
+  setRepetition: (repetition) =>
+    set((state) => ({ repetition: { ...state.repetition, ...repetition } })),
+  setEndDate: (endDate) =>
+    set((state) => ({ repetition: { ...state.repetition, endsAt: endDate } })),
+  toggleDaysOfWeek: (day) =>
+    set((state) => {
+      const daysOfWeek = state.repetition?.daysOfWeek || []
+      const newDaysOfWeek = daysOfWeek.includes(day)
+        ? daysOfWeek.filter((d) => d !== day)
+        : [...daysOfWeek, day]
+
+      return {
+        repetition: {
+          ...state.repetition,
+          daysOfWeek: newDaysOfWeek,
+        },
+      }
+    }),
+  toggleDaysOfMonth: (day) =>
+    set((state) => {
+      const daysOfMonth = state.repetition?.daysOfMonth || []
+      const newDaysOfMonth = daysOfMonth.includes(day)
+        ? daysOfMonth.filter((d) => d !== day)
+        : [...daysOfMonth, day]
+
+      return {
+        repetition: {
+          ...state.repetition,
+          daysOfMonth: newDaysOfMonth,
+        },
+      }
+    }),
+  setCustomDates: (dates) =>
     set((state) => ({
-      shadowRepeat: repeat,
-      repeat:
-        repeat === Repeat.CUSTOM
-          ? state.customDays?.length
-            ? state.customDays?.length === 7
-              ? Repeat.EVERYDAY
-              : Repeat.CUSTOM
-            : Repeat.ONCE
-          : repeat,
-    })),
-  setStartDate: (date) => set({ startDate: date }),
-  setEndDate: (date) => set({ endDate: date }),
-  toggleDay: (day) =>
-    set((state) => ({
-      customDays: state.customDays?.includes(day)
-        ? state.customDays.filter((d) => d !== day)
-        : [...(state.customDays || []), day],
-      repeat: state.customDays?.length
-        ? state.customDays?.length === 6 && !state.customDays?.includes(day)
-          ? Repeat.EVERYDAY
-          : Repeat.CUSTOM
-        : Repeat.ONCE,
+      repetition: {
+        ...state.repetition,
+        customDates: dates,
+      },
     })),
 }))
 
