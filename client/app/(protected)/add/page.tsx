@@ -107,7 +107,7 @@ const AddTask = () => {
       },
       active: true,
     }
-    if (repetitionType !== Repeat.ONCE) {
+    if (repetitionType !== Repeat.ONCE && repetitionType !== Repeat.DAILY) {
       if (repetitionType === Repeat.WEEKLY && daysOfWeek?.length)
         task.repetition.daysOfWeek = daysOfWeek.map((day) =>
           Object.values(Days).findIndex((d) => d === day),

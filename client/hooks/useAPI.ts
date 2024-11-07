@@ -1,10 +1,13 @@
-import { toastError } from '@lib/toast'
 import axios from 'axios'
 import type { AxiosInstance, InternalAxiosRequestConfig } from 'axios'
 import { usePathname, useRouter } from 'next/navigation'
 
+interface IAPI extends AxiosInstance {
+  fetcher?: any
+}
+
 const useAPI = () => {
-  const API: AxiosInstance = axios.create({
+  const API: IAPI = axios.create({
     baseURL: process.env.SERVER_BASE_URL as string,
     headers: {
       'Content-Type': 'application/json',
@@ -41,6 +44,7 @@ const useAPI = () => {
       return Promise.reject(error)
     },
   )
+  API.fetcher = (url: string) => API.get(url).then((res) => res.data)
   return API
 }
 

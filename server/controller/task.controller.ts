@@ -1,6 +1,6 @@
 import Task from '@model/Task.model'
 import type { Request, Response } from 'express'
-import { z } from 'zod'
+import { string, z } from 'zod'
 import { Repeat, TimeUnits } from '#types/task'
 import type { GetDueTasksQuery, TaskDocument } from '#types/task'
 
@@ -147,18 +147,23 @@ export const getDueTasks = async (req: Request, res: Response) => {
       .skip(skip)
       .limit(limitNum)
 
-    const dueTasks = tasks.filter((task: TaskDocument) =>
-      task.isDue(targetDate),
-    )
+    const dueTasks: any = {}
+    tasks
+      .filter((task: TaskDocument) => task.isDue(targetDate))
+      .map(({ title, id, completions, lastCompletedAt }) => {
+        dueTasks[id] = {
+          id,
+          title,
+          completions,
+          lastCompletedAt,
+        }
+      })
 
     const total = await Task.countDocuments(query)
 
     return res.status(200).json({
       success: true,
-      tasks: dueTasks.map(({ title, id }) => ({
-        id,
-        title,
-      })),
+      tasks: dueTasks,
       pagination: {
         page: pageNum,
         limit: limitNum,

@@ -20,6 +20,7 @@ const config = {
     extend: {
       backgroundColor: {
         primary: '#25272d',
+        'primary-md': '#191a1e',
         'primary-dark': '#111315',
         secondary: '#03b5fb',
       },

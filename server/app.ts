@@ -5,6 +5,7 @@ config()
 import { checkAuth } from '@controller/auth.controller'
 import initPassport, { pinAuth } from '@middleware/auth'
 import '@middleware/config'
+import rateLimitMiddleware from '@middleware/rate-limiter'
 import authRouter from '@routes/auth.routes'
 import taskRouter from '@routes/task.routes'
 import userRouter from '@routes/user.routes'
@@ -14,6 +15,7 @@ import express from 'express'
 import type { Request, Response } from 'express'
 import { connect } from 'mongoose'
 import passport from 'passport'
+import requestIp from 'request-ip'
 
 const app = express()
 const port: number = Number(process.env.PORT) || 5000
@@ -31,7 +33,9 @@ app.use(cookieParser(process.env.COOKIE_SECRET))
 app.use(express.json())
 app.use(express.urlencoded({ extended: false }))
 
-app.use('/auth', authRouter)
+app.use(requestIp.mw())
+
+app.use('/auth', rateLimitMiddleware(10, 5 * 60 * 1000), authRouter)
 app.get('/health', (_req: Request, res: Response) => {
   res.send('OK').status(200)
 })
