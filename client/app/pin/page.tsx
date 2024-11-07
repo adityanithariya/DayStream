@@ -104,14 +104,14 @@ const PINLogin: NextPage = ({ searchParams }: CommonProps) => {
   return (
     <main
       ref={box}
-      className="h-screen flex flex-col items-center sm:h-[50vh] sm:w-[50vw] lg:w-[35vw] sm:justify-center sm:mt-[20vh] sm:mx-auto sm:border sm:rounded-2xl"
+      className="h-screen bg-primary-md text-secondary-light border-bd-primary flex flex-col items-center sm:h-[50vh] sm:w-[50vw] lg:w-[35vw] sm:justify-center sm:mt-[20vh] sm:mx-auto sm:border sm:rounded-2xl"
     >
       <CheckAuth />
       <div className="relative w-[100vw] py-10 flex justify-center">
-        <FaShield className="size-7 text-primary" />
+        <FaShield className="size-7 text-secondary" />
         <Link
           href="/forgot-pin"
-          className="text-primary sm:hidden absolute right-7 text-sm"
+          className="text-secondary sm:hidden absolute right-7 text-sm"
         >
           Forgot PIN?
         </Link>
@@ -151,7 +151,7 @@ const PINLogin: NextPage = ({ searchParams }: CommonProps) => {
       </div>
       <Link
         href="/forgot-pin"
-        className="text-primary hidden sm:block text-sm mt-5"
+        className="text-secondary hidden sm:block text-sm mt-5"
       >
         Forgot PIN?
       </Link>

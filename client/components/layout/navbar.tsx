@@ -72,7 +72,7 @@ const Navbar = () => {
   const links = ['/', '/calendar', '/add', '/account', '/settings']
   const pathname = usePathname()
   return (
-    <nav className="h-[9vh] bg-[#191a1e] w-[100vw] md:w-[40vw] md:bottom-[5vh] md:rounded-lg fixed bottom-0 left-[50%] translate-x-[-50%] flex items-center gap-2">
+    <nav className="h-[9vh] bg-primary-md w-[100vw] md:w-[40vw] md:bottom-[5vh] md:rounded-lg fixed bottom-0 left-[50%] translate-x-[-50%] flex items-center gap-2">
       <Image
         src={wave}
         alt="wave"

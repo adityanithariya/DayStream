@@ -50,7 +50,7 @@ const AuthPage: NextPage = ({
 
   // Classes
   const iconStyle =
-    'p-4 size-[3.25rem] h-fit bg-white rounded-full text-primary'
+    'p-4 size-[3.25rem] h-fit bg-white rounded-full text-secondary'
   const inputWrapperStyle =
     'flex w-full rounded-full mt-4 bg-transparent border border-white placeholder-white focus:border-white focus:outline-none'
   const inputStyle =
@@ -206,7 +206,7 @@ const AuthPage: NextPage = ({
               </>
             ) : null}
             <div className={inputWrapperStyle}>
-              <RiKey2Line className="py-4 px-4 size-[3.5rem] h-fit bg-white rounded-[100px] text-primary" />
+              <RiKey2Line className="py-4 px-4 size-[3.5rem] h-fit bg-white rounded-[100px] text-secondary" />
               <input
                 type={showPassword ? 'text' : 'password'}
                 className={inputStyle}
@@ -235,7 +235,7 @@ const AuthPage: NextPage = ({
             )}
           </div>
           <button
-            className="p-2 py-3.5 my-4 bg-white rounded-3xl text-primary font-bold text-sm mt-8 uppercase shadow-[0px_6px_15px_0px_#ffffff7d] focus-visible:bg-slate-100 hover:bg-slate-100"
+            className="p-2 py-3.5 my-4 bg-white rounded-3xl text-secondary font-bold text-sm mt-8 uppercase shadow-[0px_6px_15px_0px_#ffffff7d] focus-visible:bg-slate-100 hover:bg-slate-100"
             type="submit"
             onClick={handleAuth}
           >

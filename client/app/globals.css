@@ -2,6 +2,21 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+	/* --primary: #fff;
+	--primary-md: #fff;
+	--primary-dark: #fff;
+	--secondary: #03b5fb;
+	--secondary-light: black;
+	--border-primary: #e5e7eb; */
+	--primary: #25272d;
+	--primary-md: #191a1e;
+	--primary-dark: #111315;
+	--secondary: #03b5fb;
+	--secondary-light: white;
+	--border-primary: #00000001;
+}
+
 input {
 	background-color: transparent;
 	outline: none;
@@ -62,7 +77,8 @@ input::selection {
 
 .inputWrapper input:focus + div,
 .inputWrapper input:not(:placeholder-shown) + div {
-	@apply text-[10px] top-[10%] md:top-[8%] translate-y-0 text-[#ffffffa0];
+	@apply text-[10px] top-[10%] md:top-[8%] translate-y-0;
+	color: var(--secondary-light)
 }
 
 .inputWrapper input + div {

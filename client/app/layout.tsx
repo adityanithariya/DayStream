@@ -2,6 +2,7 @@ import ToastProvider from '@components/providers/ToastProvider'
 import { Nunito } from 'next/font/google'
 import './globals.css'
 
+import clsx from 'clsx'
 import type { Metadata, Viewport } from 'next'
 
 const nunito = Nunito({ subsets: ['latin'], weight: '400' })
@@ -58,7 +59,10 @@ export default function RootLayout({
     <html lang="en" dir="ltr">
       <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon" />
       <link rel="manifest" href="manifest.json" />
-      <body className={nunito.className} suppressHydrationWarning>
+      <body
+        className={clsx(nunito.className, 'bg-primary-dark')}
+        suppressHydrationWarning
+      >
         <ToastProvider>{children}</ToastProvider>
       </body>
     </html>

@@ -32,7 +32,7 @@ const useAPI = () => {
     (error: any) => {
       const { status, data } = error.response
       if (status === 401) {
-        if (process.env.NODE_ENV === 'development') return Promise.resolve()
+        // if (process.env.NODE_ENV === 'development') return Promise.resolve()
         if (data?.code === 'pin-auth-failed') {
           if (!pathname.startsWith('/pin')) replace(`/pin?next=${pathname}`)
         } else if (!pathname.startsWith('/auth')) {

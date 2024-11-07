@@ -18,19 +18,13 @@ const config = {
       },
     },
     extend: {
-      backgroundColor: {
-        primary: '#25272d',
-        'primary-md': '#191a1e',
-        'primary-dark': '#111315',
-        secondary: '#03b5fb',
-      },
-      borderColor: {
-        secondary: '#03b5fb',
-      },
-      textColor: {
-        primary: '#03B5FB',
-      },
       colors: {
+        primary: 'var(--primary)',
+        'primary-md': 'var(--primary-md)',
+        'primary-dark': 'var(--primary-dark)',
+        'bd-primary': 'var(--border-primary)',
+        secondary: 'var(--secondary)',
+        'secondary-light': 'var(--secondary-light)',
         light: '#19ECF0',
         dark: '#03B4FB',
         'light-blue': '#40dff6',

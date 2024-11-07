@@ -1,6 +1,7 @@
 'use client'
 
 import { Calendar } from '@components/ui/calendar'
+import InputBox from '@components/ui/input-box'
 import Loader from '@components/ui/loader'
 import { MonthDayPicker } from '@components/ui/month-day-picker'
 import ScaleButton from '@components/ui/scale-button'
@@ -24,8 +25,8 @@ const FrequencyButtons: FC<{
     <ScaleButton
       type="button"
       className={clsx(
-        'flex items-center justify-start px-4 py-1.5 rounded-full transition-all text-sm',
-        repeat === id ? 'bg-[#03b5fb]' : 'bg-[#25272d]',
+        'flex items-center justify-start px-4 py-1.5 rounded-full transition-all text-sm border border-bd-primary',
+        repeat === id ? 'bg-secondary text-primary' : 'bg-primary',
       )}
       onClick={() => (repeat === id ? setRepeat(Repeat.ONCE) : setRepeat(id))}
     >
@@ -51,8 +52,10 @@ const CustomFreqButton = ({
     >
       <div
         className={clsx(
-          'rounded-full size-6 text-sm flex items-center justify-center',
-          selectedDays.includes(day) ? 'bg-[#03b5fb]' : 'bg-[#25272d]',
+          'rounded-full size-6 text-sm flex items-center justify-center border border-bd-primary',
+          selectedDays.includes(day)
+            ? 'bg-secondary text-primary'
+            : 'bg-primary',
         )}
       >
         {day.charAt(0)}
@@ -137,16 +140,15 @@ const AddTask = () => {
   return (
     <div className="px-5">
       <h2 className="py-6 text-xl">Add Task</h2>
-      <label className="inputWrapper bg-[#25272d] rounded-xl block relative px-5 py-2 pt-6 mb-5">
-        <input
-          type="text"
-          placeholder=" "
-          className="w-full"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-        />
-        <div className="absolute transition-all">Title</div>
-      </label>
+      <InputBox
+        type="text"
+        placeholder=" "
+        className="w-full"
+        value={title}
+        onChange={(e) => setTitle(e.target.value)}
+      >
+        Title
+      </InputBox>
       <div className="flex items-center justify-around mb-5 max-w-[100vw]">
         <FrequencyButtons
           title="Daily"
@@ -222,23 +224,20 @@ const AddTask = () => {
         </div>
       )}
       {repetitionType !== Repeat.CUSTOM && (
-        <label className="inputWrapper bg-[#25272d] rounded-xl block relative px-5 py-2 pt-6 mb-5">
-          <input
-            type="date"
-            placeholder=" "
-            className="w-full -ml-1 md:ml-0"
-            value={getDateString(startDate)}
-            onChange={(e) => setStartDate(new Date(e.target.value))}
-          />
-          <div className="absolute transition-all">
-            {repetitionType === Repeat.ONCE ? 'Scheduled' : 'Start'} Date
-          </div>
-        </label>
+        <InputBox
+          type="date"
+          placeholder=" "
+          className="w-full -ml-1 md:ml-0"
+          value={getDateString(startDate)}
+          onChange={(e) => setStartDate(new Date(e.target.value))}
+        >
+          {repetitionType === Repeat.ONCE ? 'Scheduled' : 'Start'} Date
+        </InputBox>
       )}
       {(repetitionType === Repeat.DAILY ||
         repetitionType === Repeat.WEEKLY ||
         repetitionType === Repeat.MONTHLY) && (
-        <label className="inputWrapper bg-[#25272d] rounded-xl block relative px-5 py-2 pt-6 mb-5">
+        <label className="inputWrapper bg-primary rounded-xl block relative px-5 py-2 pt-6 mb-5">
           <input
             type="date"
             placeholder=" "
@@ -253,10 +252,10 @@ const AddTask = () => {
         onClick={createTask}
         disabled={loading}
         className={clsx(
-          'border-[#00000001] border w-full py-3 rounded-xl transition-all hover:border hover:border-[#03b5fb]',
+          'border-[#00000001] border w-full py-3 rounded-xl transition-all hover:border hover:border-secondary',
           loading
-            ? 'bg-[#03b5fb] text-black !w-10 h-10'
-            : 'bg-[#25272d] text-[#03b5fb]',
+            ? 'bg-secondary text-black !w-10 h-10'
+            : 'bg-primary text-secondary',
         )}
         loading={loading}
       >
