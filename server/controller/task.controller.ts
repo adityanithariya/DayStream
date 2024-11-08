@@ -1,8 +1,15 @@
 import Task from '@model/Task.model'
+import { startOfDay } from '@utils/date-fns'
 import type { Request, Response } from 'express'
+import { Types } from 'mongoose'
 import { string, z } from 'zod'
-import { Repeat, TimeUnits } from '#types/task'
-import type { GetDueTasksQuery, TaskDocument } from '#types/task'
+import { CompletionStatus, Repeat, TimeUnits } from '#types/task'
+import type {
+  Completion,
+  GetDueTasksQuery,
+  TaskDocument,
+  UpdateTaskBody,
+} from '#types/task'
 
 const createTaskSchema = z.object({
   title: z.string().min(1).max(200).trim(),
@@ -150,12 +157,15 @@ export const getDueTasks = async (req: Request, res: Response) => {
     const dueTasks: any = {}
     tasks
       .filter((task: TaskDocument) => task.isDue(targetDate))
-      .map(({ title, id, completions, lastCompletedAt }) => {
+      .map(({ title, id, completions }) => {
+        const lastCompletion = completions?.[completions.length - 1]
         dueTasks[id] = {
           id,
           title,
-          completions,
-          lastCompletedAt,
+          completion:
+            startOfDay(lastCompletion?.completedAt) === startOfDay(targetDate)
+              ? lastCompletion
+              : null,
         }
       })
 
@@ -176,6 +186,82 @@ export const getDueTasks = async (req: Request, res: Response) => {
     return res.status(500).json({
       success: false,
       message: 'Internal server error',
+    })
+  }
+}
+
+export const updateTask = async (req: Request, res: Response) => {
+  try {
+    const taskId = req.params.id
+    const userId = req?.user?._id
+    const updates: UpdateTaskBody = req.body
+
+    if (!Types.ObjectId.isValid(taskId)) {
+      return res.status(400).json({ error: 'Invalid task ID' })
+    }
+
+    const task = await Task.findOne({
+      _id: taskId,
+      user: userId,
+    })
+
+    if (!task) {
+      return res.status(404).json({ error: 'Task not found' })
+    }
+
+    // Update basic fields if provided
+    if (updates.title) task.title = updates.title
+    if (updates.category !== undefined) task.category = updates.category
+    if (updates.active !== undefined) task.active = updates.active
+
+    if (updates.completion) {
+      const today = startOfDay(new Date())
+
+      const todayCompletion = task.completions.find(
+        (completion) => startOfDay(new Date(completion.completedAt)) === today,
+      )
+
+      if (todayCompletion) {
+        if (updates.completion.duration)
+          todayCompletion.duration = updates.completion.duration
+        if (updates.completion.status)
+          todayCompletion.status = updates.completion.status
+        if (updates.completion.notes !== undefined)
+          todayCompletion.notes = updates.completion.notes
+        todayCompletion.completedAt = new Date()
+      } else {
+        const newCompletion: Completion = {
+          completedAt: new Date(),
+          duration: updates.completion.duration || {
+            value: 0,
+            unit: TimeUnits.MINUTES,
+          },
+          status: updates.completion.status || CompletionStatus.COMPLETED,
+          notes: updates.completion.notes || '',
+        }
+        task.completions.push(newCompletion)
+      }
+
+      const totalPossibleCompletions = task.isDue(new Date())
+        ? task.completions.length + 1
+        : task.completions.length
+      task.completionRate =
+        (task.completions.filter((c) => c.status === CompletionStatus.COMPLETED)
+          .length /
+          totalPossibleCompletions) *
+        100
+    }
+
+    await task.save()
+
+    return res.json({
+      message: 'Task updated successfully',
+      task,
+    })
+  } catch (error) {
+    console.error('Error updating task:', error)
+    return res.status(500).json({
+      error: 'An error occurred while updating the task',
     })
   }
 }

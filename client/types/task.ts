@@ -25,13 +25,13 @@ export enum CompletionStatus {
 }
 
 export interface Completion {
-  completedAt: Date
-  duration: {
+  completedAt?: Date
+  duration?: {
     value: number
     unit: TimeUnits
   }
-  status: CompletionStatus
-  notes: string
+  status?: CompletionStatus
+  notes?: string
 }
 
 export enum Repeat {
@@ -60,4 +60,23 @@ export interface ITask {
   lastCompletedAt?: Date
   completionRate?: number
   active: boolean
+}
+export interface ITaskEdit {
+  id: string
+  title?: string
+  category?: string
+  completion?: {
+    completedAt?: Date
+    duration?: {
+      value: number
+      unit: TimeUnits
+    }
+    status?: CompletionStatus
+    notes?: string
+  }
+  active?: boolean
+}
+
+export type ITasks = {
+  [id: string]: ITaskEdit
 }

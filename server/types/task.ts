@@ -14,12 +14,12 @@ export enum CompletionStatus {
 
 export interface Completion {
   completedAt: Date
-  duration: {
+  duration?: {
     value: number
     unit: TimeUnits
   }
   status: CompletionStatus
-  notes: string
+  notes?: string
 }
 
 export enum Repeat {
@@ -52,12 +52,7 @@ export interface ITask {
 }
 
 export interface TaskDocument extends ITask, Document {
-  addCompletion(completionData: Partial<Completion>): Promise<TaskDocument>
   isDue(this: TaskDocument, date: Date): boolean
-}
-
-export interface TaskModel extends Model<TaskDocument> {
-  findDueTasks(userId: Types.ObjectId, date?: Date): Promise<TaskDocument[]>
 }
 
 export interface GetDueTasksQuery {
@@ -65,4 +60,19 @@ export interface GetDueTasksQuery {
   limit?: string
   date?: string
   category?: string
+}
+
+export interface UpdateTaskBody {
+  title?: string
+  category?: string
+  completion?: {
+    completedAt?: Date
+    duration?: {
+      value: number
+      unit: TimeUnits
+    }
+    status?: CompletionStatus
+    notes?: string
+  }
+  active?: boolean
 }

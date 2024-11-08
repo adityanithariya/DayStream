@@ -1,19 +1,12 @@
 import { startOfDay } from '@utils/date-fns'
-import type { Model, Types } from 'mongoose'
 import { Schema, model } from 'mongoose'
-import type {
-  Completion,
-  Repetition,
-  TaskDocument,
-  TaskModel,
-} from '#types/task'
+import type { Completion, Repetition, TaskDocument } from '#types/task'
 import { CompletionStatus, Repeat, TimeUnits } from '#types/task'
 
 const CompletionSchema = new Schema<Completion>(
   {
     completedAt: {
       type: Date,
-      required: true,
       index: true,
     },
     duration: {
@@ -69,7 +62,7 @@ const RepetitionSchema = new Schema<Repetition>(
   { _id: false },
 )
 
-const TaskSchema = new Schema<TaskDocument, TaskModel>(
+const TaskSchema = new Schema<TaskDocument>(
   {
     title: {
       type: String,
@@ -148,27 +141,23 @@ TaskSchema.methods.isDue = function (
   }
 }
 
-TaskSchema.methods.addCompletion = function (completionData: Completion) {
-  this.completions.push(completionData)
-  this.lastCompletedAt = completionData.completedAt
-  this.completionRate = this.calculateCompletionRate()
-  return this.save()
-}
+// TaskSchema.methods.addCompletion = function (completionData: Completion) {
+//   this.completions.push(completionData)
+//   this.completionRate = this.calculateCompletionRate()
+//   return this.save()
+// }
 
-TaskSchema.statics.findDueTasks = function (
-  userId: Types.ObjectId,
-  date = new Date(),
-) {
-  return this.find({
-    userId,
-    active: true,
-    startDate: { $lte: date },
-    $or: [
-      { lastCompletedAt: { $exists: false } },
-      { lastCompletedAt: { $lt: date } },
-    ],
-  })
-}
+// TaskSchema.statics.findDueTasks = function (
+//   userId: Types.ObjectId,
+//   date = new Date(),
+// ) {
+//   return this.find({
+//     userId,
+//     active: true,
+//     startDate: { $lte: date },
+
+//   })
+// }
 
 const Task = model<TaskDocument>('Task', TaskSchema)
 
