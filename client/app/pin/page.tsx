@@ -17,6 +17,7 @@ import { FaShield } from 'react-icons/fa6'
 import { IoIosArrowRoundBack } from 'react-icons/io'
 
 import CheckAuth from '@components/CheckAuth'
+import { toastError } from '@lib/toast'
 import type { CommonProps } from '@type/common'
 import type { NextPage } from 'next'
 
@@ -96,8 +97,7 @@ const PINLogin: NextPage = ({ searchParams }: CommonProps) => {
         box.current?.classList.add('animate-verified')
       }
     } catch (err: any) {
-      console.log(err)
-      if (err?.response?.status === 401) replace('/auth/login')
+      toastError(err?.response?.data?.error || 'Invalid PIN')
     }
   }, [pin, api, replace, next])
 

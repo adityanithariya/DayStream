@@ -78,7 +78,7 @@ input::selection {
 .inputWrapper input:focus + div,
 .inputWrapper input:not(:placeholder-shown) + div {
 	@apply text-[10px] top-[10%] md:top-[8%] translate-y-0;
-	color: var(--secondary-light)
+	color: var(--secondary-light);
 }
 
 .inputWrapper input + div {

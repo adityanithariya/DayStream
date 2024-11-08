@@ -36,7 +36,7 @@ const ProtectedGroup = ({
       {isLoading ? (
         <main className="flex justify-center items-center h-screen w-screen">
           <div className="rounded-[1.25rem] p-1 relative overflow-hidden conic-animate">
-            <div className="rounded-2xl p-1 bg-white">
+            <div className="rounded-2xl p-1 bg-primary-dark">
               <Image
                 src={logo}
                 alt="logo"

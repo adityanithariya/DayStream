@@ -119,7 +119,9 @@ export const pinAuth = async (
     return res
       .status(401)
       .json({ error: 'PIN Unauthenticated', code: 'pin-auth-failed' })
-  const user = await User.findById(req?.user?.id).select('+sessionId')
+  const user = await User.findById(req?.user?.id)
+    .select('+sessionId')
+    .select('+pin')
   if (!user?.hasPIN) return next()
 
   const pin = AES.decrypt(pinAuth, user?.sessionId as string).toString(enc.Utf8)

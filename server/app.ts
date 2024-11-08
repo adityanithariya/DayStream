@@ -35,7 +35,7 @@ app.use(express.urlencoded({ extended: false }))
 
 app.use(requestIp.mw())
 
-app.use('/auth', rateLimitMiddleware(10, 5 * 60 * 1000), authRouter)
+app.use('/auth', rateLimitMiddleware(100, 5 * 60 * 1000), authRouter)
 app.get('/health', (_req: Request, res: Response) => {
   res.send('OK').status(200)
 })

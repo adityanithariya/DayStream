@@ -89,9 +89,7 @@ userSchema.methods.isValidPin = async function (
   this: IUser,
   pin: string,
 ): Promise<boolean> {
-  const { pin: originalPin, hasPIN } = (await User.findById(this.id).select(
-    '+pin',
-  )) as IUser
+  const { pin: originalPin, hasPIN } = this
   if (!hasPIN) return false
   return await compare(pin, originalPin as string)
 }
