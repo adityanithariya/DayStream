@@ -26,7 +26,7 @@ const FrequencyButtons: FC<{
       type="button"
       className={clsx(
         'flex items-center justify-start px-4 py-1.5 rounded-full transition-all text-sm border border-bd-primary',
-        repeat === id ? 'bg-secondary text-primary' : 'bg-primary',
+        repeat === id ? 'bg-secondary text-primary' : 'bg-primary-md',
       )}
       onClick={() => (repeat === id ? setRepeat(Repeat.ONCE) : setRepeat(id))}
     >
@@ -142,8 +142,6 @@ const AddTask = () => {
       <h2 className="py-6 text-xl">Add Task</h2>
       <InputBox
         type="text"
-        placeholder=" "
-        className="w-full"
         value={title}
         onChange={(e) => setTitle(e.target.value)}
       >
@@ -227,7 +225,7 @@ const AddTask = () => {
         <InputBox
           type="date"
           placeholder=" "
-          className="w-full -ml-1 md:ml-0"
+          className="-ml-1 md:ml-0"
           value={getDateString(startDate)}
           onChange={(e) => setStartDate(new Date(e.target.value))}
         >
@@ -241,7 +239,7 @@ const AddTask = () => {
           <input
             type="date"
             placeholder=" "
-            className="w-full -ml-1 md:ml-0"
+            className="-ml-1 md:ml-0"
             value={getDateString(endDate)}
             onChange={(e) => setEndDate(new Date(e.target.value))}
           />
@@ -252,10 +250,10 @@ const AddTask = () => {
         onClick={createTask}
         disabled={loading}
         className={clsx(
-          'border-[#00000001] border w-full py-3 rounded-xl transition-all hover:border hover:border-secondary',
+          'border-bd-primary border w-full py-3 rounded-xl transition-all hover:border hover:border-secondary',
           loading
             ? 'bg-secondary text-black !w-10 h-10'
-            : 'bg-primary text-secondary',
+            : 'bg-primary-md text-secondary',
         )}
         loading={loading}
       >

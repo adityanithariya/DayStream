@@ -16,6 +16,7 @@ const CompletionSchema = new Schema<Completion>(
           type: String,
           enum: Object.values(TimeUnits),
         },
+        _id: false,
       },
       default: {
         value: 0,

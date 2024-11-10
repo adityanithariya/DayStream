@@ -3,7 +3,12 @@
 import EditTaskDialog from '@components/pages/EditTaskDialog'
 import useAPI from '@hooks/useAPI'
 import useDueTasksStore from '@store/useDueTaskStore'
-import { CompletionStatus, type ITaskEdit, type ITasks } from '@type/task'
+import {
+  CompletionStatus,
+  type ITaskEdit,
+  type ITasks,
+  TimeUnits,
+} from '@type/task'
 import clsx from 'clsx'
 import { Reorder } from 'framer-motion'
 import moment from 'moment'
@@ -19,7 +24,6 @@ const Home: NextPage = () => {
     }
   }>('/task/all', fetcher)
   const tasks: ITasks = data?.tasks || {}
-
   // {
   //   '1': {
   //     title: 'Task 1',

@@ -159,11 +159,13 @@ export const getDueTasks = async (req: Request, res: Response) => {
       .filter((task: TaskDocument) => task.isDue(targetDate))
       .map(({ title, id, completions }) => {
         const lastCompletion = completions?.[completions.length - 1]
+        // console.log(title, lastCompletion, startOfDay(lastCompletion?.completedAt), startOfDay(targetDate))
         dueTasks[id] = {
           id,
           title,
           completion:
-            startOfDay(lastCompletion?.completedAt) === startOfDay(targetDate)
+            startOfDay(lastCompletion?.completedAt).getTime() ===
+            startOfDay(targetDate).getTime()
               ? lastCompletion
               : null,
         }
@@ -218,7 +220,9 @@ export const updateTask = async (req: Request, res: Response) => {
       const today = startOfDay(new Date())
 
       const todayCompletion = task.completions.find(
-        (completion) => startOfDay(new Date(completion.completedAt)) === today,
+        (completion) =>
+          startOfDay(new Date(completion.completedAt)).getTime() ===
+          today.getTime(),
       )
 
       if (todayCompletion) {
