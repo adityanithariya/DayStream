@@ -68,7 +68,7 @@ const NavItem: FC<{
 }
 
 const Navbar = () => {
-  const positions = ['9.25%', '29.5%', '50%', '70.5%', '90.75%']
+  const positions = ['-10%', '9.25%', '29.5%', '50%', '70.5%', '90.75%']
   const links = ['/', '/calendar', '/add', '/account', '/settings']
   const pathname = usePathname()
   return (
@@ -78,14 +78,14 @@ const Navbar = () => {
         alt="wave"
         className="absolute top-0 size-[7rem] h-fit translate-x-[-50%] transition-all"
         style={{
-          left: positions[links.indexOf(pathname)],
+          left: positions[links.indexOf(pathname) + 1],
         }}
         priority
       />
       <div
         className="absolute size-12 rounded-full bg-[#03b5fb] top-0 translate-y-[-40%] translate-x-[-50%] transition-all"
         style={{
-          left: positions[links.indexOf(pathname)],
+          left: positions[links.indexOf(pathname) + 1],
         }}
       />
       <NavItem
@@ -97,7 +97,7 @@ const Navbar = () => {
           width: '1.75rem',
           height: '1.75rem',
         }}
-        href={'/'}
+        href="/"
       />
       <NavItem
         selectedTab={pathname}

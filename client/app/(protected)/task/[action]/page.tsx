@@ -64,7 +64,9 @@ const CustomFreqButton = ({
   )
 }
 
-const AddTask = () => {
+const AddTask: FC<{ searchParams: { id?: string } }> = ({
+  searchParams: { id: _id },
+}) => {
   const {
     title,
     startDate,
@@ -174,7 +176,7 @@ const AddTask = () => {
         />
       </div>
       {repetitionType === Repeat.WEEKLY && (
-        <div className="bg-primary rounded-2xl px-4 py-3 mb-5">
+        <div className="bg-primary-md rounded-2xl px-4 py-3 mb-5">
           <h3>Repeat</h3>
           <div className="text-sm text-[#03b5fb]">
             {daysOfWeek?.length
@@ -198,7 +200,7 @@ const AddTask = () => {
         </div>
       )}
       {repetitionType === Repeat.CUSTOM && (
-        <div className="bg-primary rounded-2xl px-4 py-3 mb-5">
+        <div className="bg-primary-md rounded-2xl px-4 py-3 mb-5">
           <Calendar
             mode="multiple"
             selected={customDates}
@@ -209,7 +211,7 @@ const AddTask = () => {
         </div>
       )}
       {repetitionType === Repeat.MONTHLY && (
-        <div className="bg-primary rounded-2xl px-4 py-3 mb-5">
+        <div className="bg-primary-md rounded-2xl px-4 py-3 mb-5">
           <h3 className="pt-2 -mb-2 flex items-center justify-center">
             Repeat
           </h3>
@@ -235,16 +237,15 @@ const AddTask = () => {
       {(repetitionType === Repeat.DAILY ||
         repetitionType === Repeat.WEEKLY ||
         repetitionType === Repeat.MONTHLY) && (
-        <label className="inputWrapper bg-primary rounded-xl block relative px-5 py-2 pt-6 mb-5">
-          <input
-            type="date"
-            placeholder=" "
-            className="-ml-1 md:ml-0"
-            value={getDateString(endDate)}
-            onChange={(e) => setEndDate(new Date(e.target.value))}
-          />
-          <div className="absolute transition-all">End Date</div>
-        </label>
+        <InputBox
+          type="date"
+          placeholder=" "
+          className="-ml-1 md:ml-0"
+          value={getDateString(endDate)}
+          onChange={(e) => setEndDate(new Date(e.target.value))}
+        >
+          End Date
+        </InputBox>
       )}
       <Loader
         onClick={createTask}

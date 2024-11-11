@@ -10,17 +10,23 @@ const nextConfig = {
   env: {
     SERVER_BASE_URL: process.env.SERVER_BASE_URL,
   },
-  async redirects() {
+  async rewrites() {
     return [
       {
         source: '/google/auth',
         destination: `${process.env.SERVER_BASE_URL}/auth/google`,
-        permanent: false,
       },
       {
         source: '/auth/google/callback',
         destination: `${process.env.SERVER_BASE_URL}/auth/google/callback`,
-        permanent: false,
+      },
+      {
+        source: '/add',
+        destination: '/task/add',
+      },
+      {
+        source: '/edit',
+        destination: '/task/edit',
       },
     ]
   },

@@ -3,12 +3,7 @@
 import EditTaskDialog from '@components/pages/EditTaskDialog'
 import useAPI from '@hooks/useAPI'
 import useDueTasksStore from '@store/useDueTaskStore'
-import {
-  CompletionStatus,
-  type ITaskEdit,
-  type ITasks,
-  TimeUnits,
-} from '@type/task'
+import { CompletionStatus, type ITaskEdit, type ITasks } from '@type/task'
 import clsx from 'clsx'
 import { Reorder } from 'framer-motion'
 import moment from 'moment'
@@ -22,62 +17,8 @@ const Home: NextPage = () => {
     tasks: {
       [id: string]: ITaskEdit
     }
-  }>('/task/all', fetcher)
-  const tasks: ITasks = data?.tasks || {}
-  // {
-  //   '1': {
-  //     title: 'Task 1',
-  //     id: '1',
-  //     completion: {
-  //       completedAt: new Date(),
-  //       duration: {
-  //         unit: TimeUnits.HOURS,
-  //         value: 1,
-  //       },
-  //       status: CompletionStatus.COMPLETED,
-  //       notes: 'Completed perfectly!',
-  //     },
-  //   },
-  //   '2': {
-  //     title: 'Task 2',
-  //     id: '2',
-  //     completion: {
-  //       completedAt: new Date(),
-  //       duration: {
-  //         unit: TimeUnits.HOURS,
-  //         value: 1,
-  //       },
-  //       status: CompletionStatus.PENDING,
-  //       notes: 'Completed perfectly!',
-  //     },
-  //   },
-  //   '3': {
-  //     title: 'Task 3',
-  //     id: '3',
-  //     completion: {
-  //       completedAt: new Date(new Date().setHours(new Date().getHours() + 12)),
-  //       duration: {
-  //         unit: TimeUnits.HOURS,
-  //         value: 1,
-  //       },
-  //       status: CompletionStatus.PARTIAL,
-  //       notes: 'Completed perfectly!',
-  //     },
-  //   },
-  //   '4': {
-  //     title: 'Task 4',
-  //     id: '4',
-  //     completion: {
-  //       completedAt: new Date(new Date().setHours(new Date().getHours() + 21)),
-  //       duration: {
-  //         unit: TimeUnits.HOURS,
-  //         value: 1,
-  //       },
-  //       status: CompletionStatus.FAILED,
-  //       notes: 'Completed perfectly!',
-  //     },
-  //   },
-  // }
+  }>('/task/due', fetcher)
+  const tasks: ITasks<ITaskEdit> = data?.tasks || {}
   const { dueTaskIds, setDueTaskIds } = useDueTasksStore()
   useEffect(() => {
     const dueTaskIds: string[] =

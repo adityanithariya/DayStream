@@ -1,4 +1,5 @@
 import type { Model, Types } from 'mongoose'
+import type { Pagination } from './common'
 
 export enum TimeUnits {
   MINUTES = 'minutes',
@@ -55,9 +56,7 @@ export interface TaskDocument extends ITask, Document {
   isDue(this: TaskDocument, date: Date): boolean
 }
 
-export interface GetDueTasksQuery {
-  page?: string
-  limit?: string
+export interface GetDueTasksQuery extends Pagination {
   date?: string
   category?: string
 }

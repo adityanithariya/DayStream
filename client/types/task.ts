@@ -52,6 +52,7 @@ export interface Repetition {
 }
 
 export interface ITask {
+  id?: string
   title: string
   category?: string
   startDate: Date
@@ -77,6 +78,6 @@ export interface ITaskEdit {
   active?: boolean
 }
 
-export type ITasks = {
-  [id: string]: ITaskEdit
+export type ITasks<T> = {
+  [id: string]: T
 }

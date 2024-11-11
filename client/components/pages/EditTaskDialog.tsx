@@ -16,7 +16,6 @@ import {
 } from '@components/select'
 import { Textarea } from '@components/textarea'
 import SaveCancelButton from '@components/ui/SaveCancelButton'
-import InputBox from '@components/ui/input-box'
 import useAPI from '@hooks/useAPI'
 import { CompletionStatus, type ITaskEdit, TimeUnits } from '@type/task'
 import clsx from 'clsx'
@@ -39,6 +38,7 @@ const EditTaskDialog: FC<{
     id: selectedTask?.id,
     editTitle: false,
   })
+  // biome-ignore lint/correctness/useExhaustiveDependencies: will stuck in deep stack call
   useEffect(() => {
     setData({
       ...data,

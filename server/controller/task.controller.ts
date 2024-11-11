@@ -3,6 +3,7 @@ import { startOfDay } from '@utils/date-fns'
 import type { Request, Response } from 'express'
 import { Types } from 'mongoose'
 import { string, z } from 'zod'
+import type { Pagination } from '#types/common'
 import { CompletionStatus, Repeat, TimeUnits } from '#types/task'
 import type {
   Completion,
@@ -159,7 +160,6 @@ export const getDueTasks = async (req: Request, res: Response) => {
       .filter((task: TaskDocument) => task.isDue(targetDate))
       .map(({ title, id, completions }) => {
         const lastCompletion = completions?.[completions.length - 1]
-        // console.log(title, lastCompletion, startOfDay(lastCompletion?.completedAt), startOfDay(targetDate))
         dueTasks[id] = {
           id,
           title,
@@ -190,6 +190,51 @@ export const getDueTasks = async (req: Request, res: Response) => {
       message: 'Internal server error',
     })
   }
+}
+
+export const getAllTasks = async (req: Request, res: Response) => {
+  try {
+    const { page = '1', limit = '10' } = req.query as Pagination
+
+    const pageNum = Number.parseInt(page)
+    const limitNum = Number.parseInt(limit)
+    const skip = (pageNum - 1) * limitNum
+
+    const user = req?.user?.id
+    const tasks: {
+      [key: string]: TaskDocument
+    } = {}
+    ;(await Task.find({ user }).skip(skip).limit(limitNum)).map((task) => {
+      tasks[task.id] = task
+    })
+
+    return res.json({
+      tasks,
+    })
+  } catch (error) {
+    console.error('Error fetching all tasks:', error)
+    return res.status(500).json({
+      error: 'An error occurred while fetching all tasks',
+    })
+  }
+}
+
+export const getTask = async (req: Request, res: Response) => {
+  const taskId = req.params.id
+  const userId = req?.user?._id
+
+  if (!Types.ObjectId.isValid(taskId)) {
+    return res.status(400).json({ error: 'Invalid task ID' })
+  }
+
+  const task = await Task.findOne({
+    _id: taskId,
+    user: userId,
+  })
+
+  if (!task) return res.status(404).json({ error: 'Task not found' })
+
+  return res.json({ task })
 }
 
 export const updateTask = async (req: Request, res: Response) => {
@@ -266,6 +311,35 @@ export const updateTask = async (req: Request, res: Response) => {
     console.error('Error updating task:', error)
     return res.status(500).json({
       error: 'An error occurred while updating the task',
+    })
+  }
+}
+
+export const deleteTask = async (req: Request, res: Response) => {
+  try {
+    const taskId = req.params.id
+    const userId = req?.user?._id
+
+    if (!Types.ObjectId.isValid(taskId)) {
+      return res.status(400).json({ error: 'Invalid task ID' })
+    }
+
+    const task = await Task.deleteOne({
+      _id: taskId,
+      user: userId,
+    })
+
+    if (!task) {
+      return res.status(404).json({ error: 'Task not found' })
+    }
+
+    return res.json({
+      message: 'Task deleted successfully',
+    })
+  } catch (error) {
+    console.error('Error deleting task:', error)
+    return res.status(500).json({
+      error: 'An error occurred while deleting the task',
     })
   }
 }
