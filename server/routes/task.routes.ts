@@ -17,13 +17,13 @@ taskRouter.get('/due', rateLimitMiddleware(60, 5 * 60 * 1000), getDueTasks)
 
 taskRouter.get('/all', rateLimitMiddleware(60, 5 * 60 * 1000), getAllTasks)
 
+taskRouter.get('/:id', rateLimitMiddleware(60, 5 * 60 * 1000), getTask)
+
 taskRouter.patch(
   '/update/:id',
   rateLimitMiddleware(10, 15 * 60 * 1000),
   updateTask,
 )
-
-taskRouter.get('/:id', rateLimitMiddleware(60, 5 * 60 * 1000), getTask)
 
 taskRouter.delete(
   '/delete/:id',
