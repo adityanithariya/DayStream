@@ -151,7 +151,7 @@ export const getDueTasks = async (req: Request, res: Response) => {
     if (category) query.category = category
 
     const tasks = await Task.find(query)
-      .sort({ startDate: 1 })
+      .sort({ startDate: -1 })
       .skip(skip)
       .limit(limitNum)
 
@@ -204,11 +204,19 @@ export const getAllTasks = async (req: Request, res: Response) => {
     const tasks: {
       [key: string]: TaskDocument
     } = {}
-    ;(await Task.find({ user }).skip(skip).limit(limitNum)).map((task) => {
+    const orderBy: string[] = []
+    ;(
+      await Task.find({ user })
+        .sort({ startDate: -1 })
+        .skip(skip)
+        .limit(limitNum)
+    ).map((task) => {
+      orderBy.push(task.id)
       tasks[task.id] = task
     })
 
     return res.json({
+      orderBy,
       tasks,
     })
   } catch (error) {
@@ -234,7 +242,7 @@ export const getTask = async (req: Request, res: Response) => {
 
   if (!task) return res.status(404).json({ error: 'Task not found' })
 
-  return res.json({ task })
+  return res.json(task.toJSON())
 }
 
 export const updateTask = async (req: Request, res: Response) => {

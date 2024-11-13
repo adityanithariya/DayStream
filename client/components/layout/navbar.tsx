@@ -8,7 +8,7 @@ import { usePathname } from 'next/navigation'
 import React, { type CSSProperties, type FC } from 'react'
 import { FiPlus } from 'react-icons/fi'
 import { GoHome, GoHomeFill, GoPlus } from 'react-icons/go'
-import { HiOutlineUser, HiUser } from 'react-icons/hi2'
+import { HiOutlineUser, HiPencil, HiUser } from 'react-icons/hi2'
 import {
   IoCalendarClear,
   IoCalendarClearOutline,
@@ -24,6 +24,7 @@ const NavItem: FC<{
   iconFill: IconType
   iconStyle?: CSSProperties
   href: string
+  match?: string[]
 }> = ({
   selectedTab,
   title,
@@ -31,7 +32,11 @@ const NavItem: FC<{
   iconFill: IconFill,
   iconStyle,
   href,
+  match = [],
 }) => {
+  const matches = match.length
+    ? match.find((i) => i === selectedTab || selectedTab.startsWith(i))
+    : selectedTab === href
   return (
     <Link
       href={href}
@@ -40,25 +45,22 @@ const NavItem: FC<{
       <div
         className={clsx(
           'size-fit text-white transition-all',
-          selectedTab === href && 'translate-y-[-4vh] md:translate-y-[-24px]',
+          matches && 'translate-y-[-4vh] md:translate-y-[-24px]',
         )}
       >
         <Icon
           style={iconStyle}
-          className={clsx(
-            'size-6 absolute',
-            selectedTab === href && 'opacity-0',
-          )}
+          className={clsx('size-6 absolute', matches && 'opacity-0')}
         />
         <IconFill
           style={iconStyle}
-          className={clsx('size-6', selectedTab !== href && 'opacity-0')}
+          className={clsx('size-6', !matches && 'opacity-0')}
         />
       </div>
       <div
         className={clsx(
           'absolute top-[50%] md:top-[60%] transition-all text-sm',
-          selectedTab !== href && 'opacity-0',
+          !matches && 'opacity-0',
         )}
       >
         {title}
@@ -68,8 +70,15 @@ const NavItem: FC<{
 }
 
 const Navbar = () => {
-  const positions = ['-10%', '9.25%', '29.5%', '50%', '70.5%', '90.75%']
-  const links = ['/', '/calendar', '/add', '/account', '/settings']
+  const pos = [
+    { href: '/calendar', position: '29.5%' },
+    { href: '/view', position: '29.5%' },
+    { href: '/add', position: '50%' },
+    { href: '/edit', position: '50%' },
+    { href: '/account', position: '70.5%' },
+    { href: '/settings', position: '90.75%' },
+    { href: '/', position: '9.25%' },
+  ]
   const pathname = usePathname()
   return (
     <nav className="h-[9vh] bg-primary-md w-[100vw] md:w-[40vw] md:bottom-[5vh] md:rounded-lg fixed bottom-0 left-[50%] translate-x-[-50%] flex items-center gap-2">
@@ -78,14 +87,18 @@ const Navbar = () => {
         alt="wave"
         className="absolute top-0 size-[7rem] h-fit translate-x-[-50%] transition-all"
         style={{
-          left: positions[links.indexOf(pathname) + 1],
+          left:
+            pos.find((i) => pathname === i.href || pathname.startsWith(i.href))
+              ?.position || '-1000%',
         }}
         priority
       />
       <div
         className="absolute size-12 rounded-full bg-[#03b5fb] top-0 translate-y-[-40%] translate-x-[-50%] transition-all"
         style={{
-          left: positions[links.indexOf(pathname) + 1],
+          left:
+            pos.find((i) => pathname === i.href || pathname.startsWith(i.href))
+              ?.position || '-1000%',
         }}
       />
       <NavItem
@@ -105,18 +118,33 @@ const Navbar = () => {
         iconFill={IoCalendarClear}
         icon={IoCalendarClearOutline}
         href="/calendar"
+        match={['/calendar', '/view']}
       />
-      <NavItem
-        selectedTab={pathname}
-        title="Add"
-        iconFill={FiPlus}
-        icon={GoPlus}
-        iconStyle={{
-          width: '1.75rem',
-          height: '1.75rem',
-        }}
-        href="/add"
-      />
+      {pathname.split('/')[1] === 'edit' ? (
+        <NavItem
+          selectedTab={pathname}
+          title="Edit"
+          iconFill={HiPencil}
+          icon={HiPencil}
+          iconStyle={{
+            width: '1.25rem',
+            height: '1.25rem',
+          }}
+          href={pathname}
+        />
+      ) : (
+        <NavItem
+          selectedTab={pathname}
+          title="Add"
+          iconFill={FiPlus}
+          icon={GoPlus}
+          iconStyle={{
+            width: '1.75rem',
+            height: '1.75rem',
+          }}
+          href="/add"
+        />
+      )}
       <NavItem
         selectedTab={pathname}
         title="Account"

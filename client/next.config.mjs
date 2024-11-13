@@ -28,6 +28,10 @@ const nextConfig = {
         source: '/edit',
         destination: '/task/edit',
       },
+      {
+        source: '/view/:id',
+        destination: '/task/view/:id',
+      },
     ]
   },
 }

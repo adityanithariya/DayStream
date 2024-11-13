@@ -1,6 +1,7 @@
 'use client'
 
 import EditTaskDialog from '@components/pages/EditTaskDialog'
+import Skeleton, { HomeTasks } from '@components/skeletons'
 import useAPI from '@hooks/useAPI'
 import useDueTasksStore from '@store/useDueTaskStore'
 import { CompletionStatus, type ITaskEdit, type ITasks } from '@type/task'
@@ -13,7 +14,7 @@ import useSWR from 'swr'
 
 const Home: NextPage = () => {
   const { fetcher } = useAPI()
-  const { data, mutate } = useSWR<{
+  const { data, isLoading, mutate } = useSWR<{
     tasks: {
       [id: string]: ITaskEdit
     }
@@ -85,6 +86,7 @@ const Home: NextPage = () => {
             </Reorder.Item>
           ))}
       </Reorder.Group>
+      <Skeleton loading={isLoading} component={<HomeTasks />} />
       <EditTaskDialog
         open={open}
         setOpen={setOpen}

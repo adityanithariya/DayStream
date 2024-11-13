@@ -10,6 +10,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@components/alert-dialog'
+import Skeleton, { CalendarTasks } from '@components/skeletons'
 import { Badge } from '@components/ui/badge'
 import ScaleButton from '@components/ui/scale-button'
 import useAPI from '@hooks/useAPI'
@@ -22,10 +23,12 @@ import useSWR, { mutate } from 'swr'
 
 const Calendar = () => {
   const { fetcher, delete: delAPI } = useAPI()
-  const { data } = useSWR<{
+  const { data, isLoading } = useSWR<{
     tasks: ITasks<ITask>
+    orderBy: string[]
   }>('/task/all', fetcher)
   const tasks = data?.tasks || {}
+  const orderBy = data?.orderBy || []
   console.log('tasks:', tasks)
   const [delTask, setDelTask] = useState({
     id: '',
@@ -48,12 +51,12 @@ const Calendar = () => {
     <main className="px-5 pt-3">
       <h1 className="text-xl py-4">All Tasks</h1>
       <div className="flex flex-col gap-2">
-        {Object.keys(tasks)?.map((id) => (
+        {orderBy?.map((id) => (
           <div
             key={id}
             className="py-2 px-4 rounded-md flex gap-2 justify-between bg-primary-md group"
           >
-            <Link href={`/task/${id}`} className="flex flex-col gap-2">
+            <Link href={`/view/${id}`} className="flex flex-col gap-2 w-[90%]">
               <div className="w-[100%] text-left overflow-hidden whitespace-nowrap text-ellipsis">
                 {tasks[id].title}
               </div>
@@ -86,6 +89,7 @@ const Calendar = () => {
             </ScaleButton>
           </div>
         ))}
+        <Skeleton loading={isLoading} component={<CalendarTasks />} />
         <AlertDialog
           open={delTask.open}
           onOpenChange={(open) =>

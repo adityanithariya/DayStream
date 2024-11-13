@@ -14,7 +14,7 @@
 	--primary-dark: #111315;
 	--secondary: #03b5fb;
 	--secondary-light: white;
-	--border-primary: #00000001;
+	--border-primary: #ffffff20;
 }
 
 input {
@@ -130,4 +130,18 @@ input::-webkit-outer-spin-button,
 input::-webkit-inner-spin-button {
 	-webkit-appearance: none;
 	margin: 0;
+}
+
+@keyframes button-tap {
+	0% {
+		background-color: #03b5fb30;
+	}
+
+	100% {
+		background-color: var(--primary-md);
+	}
+}
+
+.animate-button-tap {
+	animation: button-tap 0.1s ease-out;
 }
