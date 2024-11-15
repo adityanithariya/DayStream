@@ -65,7 +65,7 @@ export interface ITask {
 export interface ITaskEdit {
   id: string
   title?: string
-  category?: string
+  category?: ICategory
   completion?: {
     completedAt?: Date
     duration?: {
@@ -80,4 +80,10 @@ export interface ITaskEdit {
 
 export type ITasks<T> = {
   [id: string]: T
+}
+
+export interface ICategory {
+  id: string
+  name: string
+  color?: string
 }

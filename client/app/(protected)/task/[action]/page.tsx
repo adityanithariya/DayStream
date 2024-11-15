@@ -1,5 +1,6 @@
 'use client'
 
+import Combobox from '@components/ui/Combobox'
 import { Calendar } from '@components/ui/calendar'
 import InputBox from '@components/ui/input-box'
 import Loader from '@components/ui/loader'
@@ -70,6 +71,7 @@ const WriteTask: FC<{
 }> = ({ searchParams: { id }, params: { action } }) => {
   const {
     title,
+    category,
     startDate,
     repetition: {
       type: repetitionType,
@@ -79,6 +81,7 @@ const WriteTask: FC<{
       endsAt: endDate,
     },
     setTitle,
+    setCategory,
     setRepetition,
     setStartDate,
     setEndDate,
@@ -127,6 +130,7 @@ const WriteTask: FC<{
     setLoading(true)
     const task: ITask = {
       title,
+      category,
       startDate,
       repetition: {
         type: repetitionType,
@@ -164,6 +168,7 @@ const WriteTask: FC<{
     setLoading(true)
     const task: ITask = {
       title,
+      category,
       startDate,
       repetition: {
         type: repetitionType,
@@ -207,6 +212,7 @@ const WriteTask: FC<{
       >
         Title
       </InputBox>
+      <Combobox value={category} setValue={setCategory} />
       <div className="flex items-center justify-around mb-5 max-w-[100vw]">
         <FrequencyButtons
           title="Daily"

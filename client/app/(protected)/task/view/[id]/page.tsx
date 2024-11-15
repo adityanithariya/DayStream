@@ -8,7 +8,7 @@ import ScaleButton from '@components/ui/scale-button'
 import { SkeletonElement } from '@components/ui/skeleton'
 import { Switch } from '@components/ui/switch'
 import useAPI from '@hooks/useAPI'
-import type { ITask } from '@type/task'
+import type { ICategory, ITask } from '@type/task'
 import clsx from 'clsx'
 import Link from 'next/link'
 import React, { useState, type FC } from 'react'
@@ -25,16 +25,14 @@ const CustomBadge: FC<{ children?: string; className?: string }> = ({
 
 const TaskView: FC<{ params: { id?: string } }> = ({ params: { id } }) => {
   const { fetcher, patch } = useAPI()
-  const { data, error, isLoading, mutate } = useSWR<ITask>(
-    `/task/${id}`,
-    fetcher,
-    {
-      onErrorRetry: (error) => {
-        console.log(error)
-        return
-      },
+  const { data, error, isLoading, mutate } = useSWR<
+    ITask & { category: ICategory }
+  >(`/task/${id}`, fetcher, {
+    onErrorRetry: (error) => {
+      console.log(error)
+      return
     },
-  )
+  })
   const [activeLoading, setActiveLoading] = useState(false)
   const updateActive = async () => {
     setActiveLoading(true)
@@ -91,7 +89,7 @@ const TaskView: FC<{ params: { id?: string } }> = ({ params: { id } }) => {
           >
             {data?.category && (
               <CustomBadge className="border-orange-700 bg-orange-700/10">
-                {data?.category}
+                {data?.category?.name}
               </CustomBadge>
             )}
           </Skeleton>

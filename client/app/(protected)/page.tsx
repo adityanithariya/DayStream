@@ -2,6 +2,7 @@
 
 import EditTaskDialog from '@components/pages/EditTaskDialog'
 import Skeleton, { HomeTasks } from '@components/skeletons'
+import { Badge } from '@components/ui/badge'
 import useAPI from '@hooks/useAPI'
 import useDueTasksStore from '@store/useDueTaskStore'
 import { CompletionStatus, type ITaskEdit, type ITasks } from '@type/task'
@@ -77,7 +78,16 @@ const Home: NextPage = () => {
                   }}
                   className="flex justify-between items-center w-full"
                 >
-                  {tasks[id]?.title}
+                  <div className="pr-4">
+                    <span className="whitespace-nowrap text-ellipsis overflow-hidden">
+                      {tasks[id]?.title}
+                    </span>
+                    {tasks[id]?.category && (
+                      <Badge className="rounded-full ml-2 bg-gray-600/10 border border-gray-600">
+                        {tasks[id]?.category?.name}
+                      </Badge>
+                    )}
+                  </div>
                   <div className="text-sm text-secondary-light opacity-50">
                     {moment(tasks[id]?.completion?.completedAt).format('HH:mm')}
                   </div>

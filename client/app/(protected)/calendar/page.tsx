@@ -14,7 +14,7 @@ import Skeleton, { CalendarTasks } from '@components/skeletons'
 import { Badge } from '@components/ui/badge'
 import ScaleButton from '@components/ui/scale-button'
 import useAPI from '@hooks/useAPI'
-import type { ITask, ITasks } from '@type/task'
+import type { ICategory, ITask, ITasks } from '@type/task'
 import clsx from 'clsx'
 import Link from 'next/link'
 import React, { useState } from 'react'
@@ -24,7 +24,7 @@ import useSWR, { mutate } from 'swr'
 const Calendar = () => {
   const { fetcher, delete: delAPI } = useAPI()
   const { data, isLoading } = useSWR<{
-    tasks: ITasks<ITask>
+    tasks: ITasks<ITask & { category: ICategory }>
     orderBy: string[]
   }>('/task/all', fetcher)
   const tasks = data?.tasks || {}
@@ -75,6 +75,11 @@ const Calendar = () => {
                 >
                   {tasks[id].active ? 'Active' : 'Inactive'}
                 </Badge>
+                {tasks[id].category && (
+                  <Badge className="rounded-full bg-gray-600/10 border border-gray-600">
+                    {tasks[id].category.name}
+                  </Badge>
+                )}
               </div>
             </Link>
             <ScaleButton
@@ -108,7 +113,7 @@ const Calendar = () => {
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
-              <AlertDialogCancel className="bg-primary-dark text-secondary-light border-bd-primary">
+              <AlertDialogCancel className="bg-primary-dark text-secondary-light border-transparent">
                 Cancel
               </AlertDialogCancel>
               <AlertDialogAction onClick={deleteTask} className="bg-primary-md">

@@ -1,4 +1,4 @@
-import type { Model, Types } from 'mongoose'
+import type { Types } from 'mongoose'
 import type { Pagination } from './common'
 
 export enum TimeUnits {
@@ -42,7 +42,7 @@ export interface Repetition {
 
 export interface ITask {
   title: string
-  category?: string
+  category?: Types.ObjectId
   startDate: Date
   repetition: Repetition
   completions: Completion[]

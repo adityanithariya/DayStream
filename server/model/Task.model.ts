@@ -72,8 +72,7 @@ const TaskSchema = new Schema<TaskDocument>(
       index: 'text', // Enable text search on title
     },
     category: {
-      type: String,
-      index: true, // Index for faster category-based queries
+      type: Schema.Types.ObjectId,
     },
     startDate: {
       type: Date,

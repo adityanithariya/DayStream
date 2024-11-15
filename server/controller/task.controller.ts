@@ -1,8 +1,9 @@
+import Category from '@model/Category.model'
 import Task from '@model/Task.model'
 import { startOfDay } from '@utils/date-fns'
 import type { Request, Response } from 'express'
 import { Types } from 'mongoose'
-import { string, z } from 'zod'
+import { z } from 'zod'
 import type { Pagination } from '#types/common'
 import { CompletionStatus, Repeat, TimeUnits } from '#types/task'
 import type {
@@ -14,7 +15,7 @@ import type {
 
 const createTaskSchema = z.object({
   title: z.string().min(1).max(200).trim(),
-  category: z.string().min(1).max(50).trim().optional(),
+  category: z.instanceof(Types.ObjectId).optional(),
   startDate: z.string().datetime(),
   repetition: z
     .object({
@@ -84,6 +85,18 @@ export const createTask = async (req: Request, res: Response) => {
             })
           break
       }
+    }
+
+    if (taskData.category) {
+      let category = await Category.findById(taskData.category)
+
+      if (!category) {
+        category = await Category.create({
+          name: taskData.category,
+          user: req.user?._id,
+        })
+      }
+      taskData.category = category._id
     }
 
     const task = await Task.create({
@@ -156,20 +169,23 @@ export const getDueTasks = async (req: Request, res: Response) => {
       .limit(limitNum)
 
     const dueTasks: any = {}
-    tasks
-      .filter((task: TaskDocument) => task.isDue(targetDate))
-      .map(({ title, id, completions }) => {
-        const lastCompletion = completions?.[completions.length - 1]
-        dueTasks[id] = {
-          id,
-          title,
-          completion:
-            startOfDay(lastCompletion?.completedAt).getTime() ===
-            startOfDay(targetDate).getTime()
-              ? lastCompletion
-              : null,
-        }
-      })
+    await Promise.all(
+      tasks
+        .filter((task: TaskDocument) => task.isDue(targetDate))
+        .map(async ({ id, title, category, completions }) => {
+          const lastCompletion = completions?.[completions.length - 1]
+          dueTasks[id] = {
+            id,
+            title,
+            category: (await Category.findById(category))?.toJSON(),
+            completion:
+              startOfDay(lastCompletion?.completedAt).getTime() ===
+              startOfDay(targetDate).getTime()
+                ? lastCompletion
+                : null,
+          }
+        }),
+    )
 
     const total = await Task.countDocuments(query)
 
@@ -202,18 +218,23 @@ export const getAllTasks = async (req: Request, res: Response) => {
 
     const user = req?.user?.id
     const tasks: {
-      [key: string]: TaskDocument
+      [key: string]: any
     } = {}
     const orderBy: string[] = []
-    ;(
-      await Task.find({ user })
-        .sort({ startDate: -1 })
-        .skip(skip)
-        .limit(limitNum)
-    ).map((task) => {
-      orderBy.push(task.id)
-      tasks[task.id] = task
-    })
+    await Promise.all(
+      (
+        await Task.find({ user })
+          .sort({ startDate: -1 })
+          .skip(skip)
+          .limit(limitNum)
+      ).map(async (task) => {
+        orderBy.push(task.id)
+        tasks[task.id] = {
+          ...task.toJSON(),
+          category: (await Category.findById(task.category))?.toJSON(),
+        }
+      }),
+    )
 
     return res.json({
       orderBy,
@@ -242,6 +263,8 @@ export const getTask = async (req: Request, res: Response) => {
 
   if (!task) return res.status(404).json({ error: 'Task not found' })
 
+  task.category = (await Category.findById(task.category))?.toJSON()
+
   return res.json(task.toJSON())
 }
 
@@ -266,7 +289,19 @@ export const updateTask = async (req: Request, res: Response) => {
 
     // Update basic fields if provided
     if (updates.title) task.title = updates.title
-    if (updates.category !== undefined) task.category = updates.category
+    if (updates.category) {
+      let category: any
+      if (Types.ObjectId.isValid(updates.category)) {
+        category = await Category.findById(updates.category)
+      }
+      if (!category) {
+        category = await Category.create({
+          name: updates.category,
+          user: req.user?._id,
+        })
+      }
+      task.category = category._id
+    }
     if (updates.active !== undefined) task.active = updates.active
 
     if (updates.completion) {
@@ -348,6 +383,23 @@ export const deleteTask = async (req: Request, res: Response) => {
     console.error('Error deleting task:', error)
     return res.status(500).json({
       error: 'An error occurred while deleting the task',
+    })
+  }
+}
+
+export const getAllCategories = async (req: Request, res: Response) => {
+  try {
+    const userId = req?.user?._id
+
+    const categories = await Category.find({
+      user: userId,
+    })
+
+    return res.json(categories)
+  } catch (error) {
+    console.error('Error fetching categories:', error)
+    return res.status(500).json({
+      error: 'An error occurred while fetching categories',
     })
   }
 }

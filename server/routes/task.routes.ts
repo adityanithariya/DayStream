@@ -1,6 +1,7 @@
 import {
   createTask,
   deleteTask,
+  getAllCategories,
   getAllTasks,
   getDueTasks,
   getTask,
@@ -16,6 +17,12 @@ taskRouter.post('/create', rateLimitMiddleware(10, 15 * 60 * 1000), createTask)
 taskRouter.get('/due', rateLimitMiddleware(60, 5 * 60 * 1000), getDueTasks)
 
 taskRouter.get('/all', rateLimitMiddleware(60, 5 * 60 * 1000), getAllTasks)
+
+taskRouter.get(
+  '/category',
+  rateLimitMiddleware(60, 5 * 60 * 1000),
+  getAllCategories,
+)
 
 taskRouter.get('/:id', rateLimitMiddleware(60, 5 * 60 * 1000), getTask)
 
