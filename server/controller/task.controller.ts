@@ -15,7 +15,7 @@ import type {
 
 const createTaskSchema = z.object({
   title: z.string().min(1).max(200).trim(),
-  category: z.instanceof(Types.ObjectId).optional(),
+  category: z.any().optional(),
   startDate: z.string().datetime(),
   repetition: z
     .object({
@@ -263,9 +263,10 @@ export const getTask = async (req: Request, res: Response) => {
 
   if (!task) return res.status(404).json({ error: 'Task not found' })
 
-  task.category = (await Category.findById(task.category))?.toJSON()
-
-  return res.json(task.toJSON())
+  return res.json({
+    ...task.toJSON(),
+    category: (await Category.findById(task.category))?.toJSON(),
+  })
 }
 
 export const updateTask = async (req: Request, res: Response) => {

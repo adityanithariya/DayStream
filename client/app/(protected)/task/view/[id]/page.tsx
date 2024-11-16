@@ -11,6 +11,7 @@ import useAPI from '@hooks/useAPI'
 import type { ICategory, ITask } from '@type/task'
 import clsx from 'clsx'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import React, { useState, type FC } from 'react'
 import { HiPencil } from 'react-icons/hi2'
 import { IoIosArrowBack } from 'react-icons/io'
@@ -24,6 +25,7 @@ const CustomBadge: FC<{ children?: string; className?: string }> = ({
 )
 
 const TaskView: FC<{ params: { id?: string } }> = ({ params: { id } }) => {
+  const { back } = useRouter()
   const { fetcher, patch } = useAPI()
   const { data, error, isLoading, mutate } = useSWR<
     ITask & { category: ICategory }
@@ -73,7 +75,7 @@ const TaskView: FC<{ params: { id?: string } }> = ({ params: { id } }) => {
   return (
     <div className="px-4 pt-3">
       <div className="flex gap-3 my-5 items-start justify-start">
-        <ScaleButton>
+        <ScaleButton onClick={back}>
           <IoIosArrowBack className="size-5" />
         </ScaleButton>
         <h1 className="flex items-center justify-center gap-2">
@@ -88,7 +90,7 @@ const TaskView: FC<{ params: { id?: string } }> = ({ params: { id } }) => {
             component={<SkeletonElement className="w-14 h-5 rounded-full" />}
           >
             {data?.category && (
-              <CustomBadge className="border-orange-700 bg-orange-700/10">
+              <CustomBadge className="border-gray-700 bg-gray-700/10">
                 {data?.category?.name}
               </CustomBadge>
             )}
