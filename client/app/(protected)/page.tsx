@@ -78,7 +78,7 @@ const Home: NextPage = () => {
                   }}
                   className="flex justify-between items-center w-full"
                 >
-                  <div className="pr-4">
+                  <div className="w-[85%] flex">
                     <span className="whitespace-nowrap text-ellipsis overflow-hidden">
                       {tasks[id]?.title}
                     </span>

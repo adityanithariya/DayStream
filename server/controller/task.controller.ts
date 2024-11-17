@@ -221,20 +221,23 @@ export const getAllTasks = async (req: Request, res: Response) => {
       [key: string]: any
     } = {}
     const orderBy: string[] = []
+    const rawTasks = await Task.find({ user })
+      .sort({ startDate: -1 })
+      .skip(skip)
+      .limit(limitNum)
+
+    const completedTasks: string[] = []
     await Promise.all(
-      (
-        await Task.find({ user })
-          .sort({ startDate: -1 })
-          .skip(skip)
-          .limit(limitNum)
-      ).map(async (task) => {
-        orderBy.push(task.id)
+      rawTasks.map(async (task) => {
+        if (task.isDue()) orderBy.push(task.id)
+        else completedTasks.push(task.id)
         tasks[task.id] = {
           ...task.toJSON(),
           category: (await Category.findById(task.category))?.toJSON(),
         }
       }),
     )
+    orderBy.push(...completedTasks)
 
     return res.json({
       orderBy,
@@ -284,26 +287,24 @@ export const updateTask = async (req: Request, res: Response) => {
       user: userId,
     })
 
-    if (!task) {
-      return res.status(404).json({ error: 'Task not found' })
-    }
+    if (!task) return res.status(404).json({ error: 'Task not found' })
 
     // Update basic fields if provided
     if (updates.title) task.title = updates.title
     if (updates.category) {
       let category: any
-      if (Types.ObjectId.isValid(updates.category)) {
+      if (Types.ObjectId.isValid(updates.category))
         category = await Category.findById(updates.category)
-      }
-      if (!category) {
+      if (!category)
         category = await Category.create({
           name: updates.category,
           user: req.user?._id,
         })
-      }
       task.category = category._id
     }
     if (updates.active !== undefined) task.active = updates.active
+    if (updates.startDate) task.startDate = new Date(updates.startDate)
+    if (updates.repetition) task.repetition = updates.repetition
 
     if (updates.completion) {
       const today = startOfDay(new Date())
@@ -335,7 +336,7 @@ export const updateTask = async (req: Request, res: Response) => {
         task.completions.push(newCompletion)
       }
 
-      const totalPossibleCompletions = task.isDue(new Date())
+      const totalPossibleCompletions = task.isDue()
         ? task.completions.length + 1
         : task.completions.length
       task.completionRate =

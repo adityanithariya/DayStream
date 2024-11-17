@@ -29,7 +29,6 @@ const Calendar = () => {
   }>('/task/all', fetcher)
   const tasks = data?.tasks || {}
   const orderBy = data?.orderBy || []
-  console.log('tasks:', tasks)
   const [delTask, setDelTask] = useState({
     id: '',
     open: false,

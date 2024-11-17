@@ -57,8 +57,6 @@ const RepetitionSchema = new Schema<Repetition>(
     customDates: [Date],
     // End date for the repetition (optional)
     endsAt: Date,
-    // Maximum number of occurrences (optional)
-    maxOccurrences: Number,
   },
   { _id: false },
 )
@@ -122,8 +120,9 @@ TaskSchema.methods.isDue = function (
   const today = startOfDay(date)
 
   if (!this.active) return false
-  if (this.startDate > today) return false
-  if (this.repetition?.endsAt && today > this.repetition.endsAt) return false
+  if (startOfDay(this.startDate) > today) return false
+  if (this.repetition?.endsAt && today > startOfDay(this.repetition.endsAt))
+    return false
 
   switch (repetition.type) {
     case Repeat.ONCE:

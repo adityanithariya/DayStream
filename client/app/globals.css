@@ -15,6 +15,10 @@
 	--secondary: #03b5fb;
 	--secondary-light: white;
 	--border-primary: #ffffff20;
+	--toastify-color-light: var(--primary-md);
+	--toastify-color-dark: var(--primary-md);
+	--toastify-text-color-light: var(--secondary-light);
+	--toastify-text-color-dark: var(--secondary-light);
 }
 
 input {

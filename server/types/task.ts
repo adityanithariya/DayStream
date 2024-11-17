@@ -37,7 +37,6 @@ export interface Repetition {
   daysOfMonth: number[]
   customDates: Date[]
   endsAt?: Date
-  maxOccurrences?: number
 }
 
 export interface ITask {
@@ -53,7 +52,7 @@ export interface ITask {
 }
 
 export interface TaskDocument extends ITask, Document {
-  isDue(this: TaskDocument, date: Date): boolean
+  isDue(this: TaskDocument, date?: Date): boolean
 }
 
 export interface GetDueTasksQuery extends Pagination {
@@ -64,6 +63,8 @@ export interface GetDueTasksQuery extends Pagination {
 export interface UpdateTaskBody {
   title?: string
   category?: string
+  startDate?: string
+  repetition?: Repetition
   completion?: {
     completedAt?: Date
     duration?: {

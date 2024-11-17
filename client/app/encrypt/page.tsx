@@ -1,5 +1,6 @@
 'use client'
 
+import { toastSuccess } from '@lib/toast'
 import { AES, enc } from 'crypto-js'
 import React, { useState } from 'react'
 
@@ -45,6 +46,12 @@ const Encrypt = () => {
         Decrypt
       </button>
       <div>{encrypted}</div>
+      <button
+        type="button"
+        onClick={() => toastSuccess('Data copied to clipboard')}
+      >
+        Toast
+      </button>
     </main>
   )
 }
