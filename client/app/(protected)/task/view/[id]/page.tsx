@@ -34,6 +34,7 @@ const TaskView: FC<{ params: { id?: string } }> = ({ params: { id } }) => {
       console.log(error)
       return
     },
+    revalidateOnFocus: false,
   })
   const [activeLoading, setActiveLoading] = useState(false)
   const updateActive = async () => {

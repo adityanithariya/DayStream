@@ -26,7 +26,7 @@ const Calendar = () => {
   const { data, isLoading } = useSWR<{
     tasks: ITasks<ITask & { category: ICategory }>
     orderBy: string[]
-  }>('/task/all', fetcher)
+  }>('/task/all', fetcher, { revalidateOnFocus: false })
   const tasks = data?.tasks || {}
   const orderBy = data?.orderBy || []
   const [delTask, setDelTask] = useState({

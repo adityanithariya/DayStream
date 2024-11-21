@@ -126,7 +126,13 @@ TaskSchema.methods.isDue = function (
 
   switch (repetition.type) {
     case Repeat.ONCE:
-      return startOfDay(this.startDate) <= today && !this.completions.length
+      return (
+        startOfDay(this.startDate) <= today &&
+        (!this.completions.length ||
+          startOfDay(
+            this.completions[this.completions.length - 1].completedAt,
+          ).getTime() === today.getTime())
+      )
     case Repeat.DAILY:
       return true
     case Repeat.WEEKLY:

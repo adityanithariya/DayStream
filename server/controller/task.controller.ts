@@ -163,28 +163,25 @@ export const getDueTasks = async (req: Request, res: Response) => {
 
     if (category) query.category = category
 
-    const tasks = await Task.find(query)
-      .sort({ startDate: -1 })
-      .skip(skip)
-      .limit(limitNum)
+    const tasks = (await Task.find(query).sort({ startDate: -1 }))
+      .filter((task) => task.isDue())
+      .slice(skip, skip + limitNum)
 
     const dueTasks: any = {}
     await Promise.all(
-      tasks
-        .filter((task: TaskDocument) => task.isDue(targetDate))
-        .map(async ({ id, title, category, completions }) => {
-          const lastCompletion = completions?.[completions.length - 1]
-          dueTasks[id] = {
-            id,
-            title,
-            category: (await Category.findById(category))?.toJSON(),
-            completion:
-              startOfDay(lastCompletion?.completedAt).getTime() ===
-              startOfDay(targetDate).getTime()
-                ? lastCompletion
-                : null,
-          }
-        }),
+      tasks.map(async ({ id, title, category, completions }) => {
+        const lastCompletion = completions?.[completions.length - 1]
+        dueTasks[id] = {
+          id,
+          title,
+          category: (await Category.findById(category))?.toJSON(),
+          completion:
+            startOfDay(lastCompletion?.completedAt).getTime() ===
+            startOfDay(targetDate).getTime()
+              ? lastCompletion
+              : null,
+        }
+      }),
     )
 
     const total = await Task.countDocuments(query)

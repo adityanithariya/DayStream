@@ -19,7 +19,7 @@ const Home: NextPage = () => {
     tasks: {
       [id: string]: ITaskEdit
     }
-  }>('/task/due', fetcher)
+  }>('/task/due', fetcher, { revalidateOnFocus: false })
   const tasks: ITasks<ITaskEdit> = data?.tasks || {}
   const { dueTaskIds, setDueTaskIds } = useDueTasksStore()
   useEffect(() => {
@@ -88,9 +88,13 @@ const Home: NextPage = () => {
                       </Badge>
                     )}
                   </div>
-                  <div className="text-sm text-secondary-light opacity-50">
-                    {moment(tasks[id]?.completion?.completedAt).format('HH:mm')}
-                  </div>
+                  {tasks[id]?.completion?.completedAt && (
+                    <div className="text-sm text-secondary-light opacity-50">
+                      {moment(tasks[id]?.completion?.completedAt).format(
+                        'HH:mm',
+                      )}
+                    </div>
+                  )}
                 </button>
               </div>
             </Reorder.Item>

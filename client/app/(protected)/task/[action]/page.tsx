@@ -104,6 +104,7 @@ const WriteTask: FC<{
           (date: string) => new Date(date),
         )
         setRepetition(data.repetition)
+        setCategory(data.category.id)
       } catch (err: any) {
         console.error(err)
         toastError('Failed to fetch task')
